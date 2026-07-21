@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service Log — 2024 Grand Cherokee Summit</title>
+<meta name="description" content="Maintenance and service records for a 2024 Jeep Grand Cherokee Summit.">
+<meta name="theme-color" content="#FBFBF9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Service Log">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBFBF9; --ink:#1A1D1F; --mid:#666D72; --faint:#98A0A5;
+    --rule:#E4E4DF; --rule-2:#F0F0EB;
+    --red:#A33224; --amber:#AF7A1E; --green:#4E6B3D; --slate:#4F6E82;
+    --display:'Barlow Condensed','Arial Narrow',sans-serif;
+    --body:'Inter',system-ui,-apple-system,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 20px 90px}
+  .lab{font-family:var(--display);text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--faint)}
+
+  header{padding:30px 0 0}
+  .title{font-family:var(--display);font-size:26px;font-weight:600;line-height:1.1}
+  .sub{color:var(--mid);font-size:13.5px;margin-top:4px}
+  .odo-block{margin:22px 0 0;display:flex;align-items:flex-end;gap:22px;flex-wrap:wrap}
+  .odo-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .odo{font-family:var(--mono);font-weight:600;font-size:clamp(30px,7.5vw,44px);line-height:1.05;
+    letter-spacing:-.02em;color:var(--ink);background:transparent;border:0;border-bottom:1.5px solid var(--rule);
+    padding:0 2px 4px;width:100%;max-width:230px;-moz-appearance:textfield}
+  .odo:focus{outline:none;border-bottom-color:var(--ink)}
+  .odo::-webkit-outer-spin-button,.odo::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .setting{display:flex;flex-direction:column;gap:6px}
+  select,input[type=date],input[type=text],input[type=number]{
+    background:#fff;color:var(--ink);border:1px solid var(--rule);border-radius:6px;
+    padding:8px 10px;font-family:var(--body);font-size:14px;max-width:100%}
+  select:focus,input:focus,textarea:focus{outline:2px solid var(--slate);outline-offset:1px}
+  .rate{margin-top:10px;color:var(--mid);font-size:12.5px}
+  .rate b{font-family:var(--mono);color:var(--ink);font-weight:600}
+
+  .banner{margin:22px 0 0;padding:14px 16px;background:#fff;border:1px solid var(--rule);
+    border-left:3px solid var(--amber);border-radius:6px;font-size:13.5px;color:var(--mid)}
+  .banner b{color:var(--ink)}
+  .banner .x{float:right;margin-left:12px}
+
+  .tally{display:flex;gap:22px;flex-wrap:wrap;align-items:center;
+    margin:26px 0 0;padding:14px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .chip{background:none;border:0;padding:0;cursor:pointer;display:flex;align-items:center;gap:8px;
+    font-family:var(--display);text-transform:uppercase;letter-spacing:.14em;font-size:11.5px;color:var(--faint)}
+  .chip .n{font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:0}
+  .chip[aria-pressed="true"],.chip:hover{color:var(--ink)}
+  .chip .dot{width:7px;height:7px;border-radius:50%}
+
+  .colhead{display:grid;grid-template-columns:118px 1fr;gap:16px;margin:26px 0 0;padding-bottom:8px;
+    border-bottom:1px solid var(--rule)}
+  .item{display:grid;grid-template-columns:118px 1fr;gap:16px;
+    border-bottom:1px solid var(--rule-2);padding:16px 0 15px}
+  .mile{font-family:var(--mono);font-size:17px;font-weight:600;line-height:1.2}
+  .mile small{display:block;font-family:var(--body);font-size:11.5px;font-weight:500;margin-top:3px}
+  .line1{display:flex;align-items:baseline;gap:10px}
+  .dot{width:7px;height:7px;border-radius:50%;flex:none;transform:translateY(-2px)}
+  .name{font-weight:500;font-size:15.5px;flex:1;min-width:0}
+  .due{font-family:var(--mono);font-size:13px;white-space:nowrap;font-weight:600}
+  .line2{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline;margin:5px 0 0 15px;color:var(--mid);font-size:13px}
+  .rating{font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:600}
+  .sep{color:var(--rule)}
+  .actions{margin:9px 0 0 15px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+  button.link{background:none;border:0;padding:0;cursor:pointer;font-family:var(--body);
+    font-size:12.5px;color:var(--slate);font-weight:500}
+  button.link:hover{text-decoration:underline}
+  button.link.q{color:var(--faint)}
+  button.link.d{color:var(--red)}
+
+  .panel{margin:10px 0 0 15px;padding:14px;background:#fff;border:1px solid var(--rule);
+    border-radius:6px;max-width:660px}
+  .detail{font-size:13.5px;color:var(--mid)}
+  .detail .spec{font-family:var(--mono);font-size:12px;color:var(--faint);margin-top:7px}
+  .entries{margin-top:10px;border-top:1px solid var(--rule-2);padding-top:9px}
+  .entry{display:flex;gap:10px;align-items:baseline;font-size:12.5px;color:var(--mid);padding:3px 0}
+  .entry .m{font-family:var(--mono);color:var(--ink);font-weight:600;white-space:nowrap}
+  .entry .rm{margin-left:auto;color:var(--faint);font-size:11.5px}
+
+  .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+  .form .f{display:flex;flex-direction:column;gap:4px}
+  .form .wide{grid-column:1/-1}
+  .form label{font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:10px;color:var(--faint)}
+  textarea{background:#fff;color:var(--ink);border:1px solid var(--rule);border-radius:6px;
+    padding:8px 10px;font-family:var(--body);font-size:14px;resize:vertical;min-height:56px;width:100%}
+  .form .check{margin-top:2px}
+  label.cb{display:flex;align-items:center;gap:8px;font-family:var(--body);text-transform:none;
+    letter-spacing:0;font-size:13px;color:var(--mid);cursor:pointer}
+  label.cb input{width:15px;height:15px;accent-color:var(--slate);margin:0}
+  .form-actions{grid-column:1/-1;display:flex;gap:10px;margin-top:2px}
+  button.btn{font-family:var(--body);font-size:13px;font-weight:500;padding:8px 14px;border-radius:6px;
+    border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer}
+  button.btn.ghost{background:#fff;color:var(--ink);border-color:var(--rule)}
+  button.btn:hover{opacity:.9}
+
+  h2.sec{font-family:var(--display);text-transform:uppercase;letter-spacing:.2em;font-size:11px;
+    color:var(--faint);margin:44px 0 0;font-weight:600}
+  .repair{border-bottom:1px solid var(--rule-2);padding:13px 0;display:grid;
+    grid-template-columns:118px 1fr auto;gap:16px;align-items:baseline}
+  .repair .m{font-family:var(--mono);font-size:15px;font-weight:600}
+  .repair .m small{display:block;font-family:var(--body);font-size:11.5px;color:var(--faint);margin-top:2px}
+  .repair .t{font-weight:500}
+  .repair .n{color:var(--mid);font-size:13px;margin-top:3px}
+
+  button.link.strong{color:var(--ink);font-weight:600}
+  #toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,14px);
+    background:var(--ink);color:#fff;font-size:13.5px;padding:11px 18px;border-radius:8px;
+    box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;z-index:50;max-width:92vw;text-align:center}
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+  @media(prefers-reduced-motion:no-preference){#toast{transition:opacity .18s ease,transform .18s ease}}
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--rule);color:var(--mid);font-size:12.5px;line-height:1.65}
+  footer b{color:var(--ink);font-weight:600}
+  .foot-actions{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+  .totals{font-family:var(--mono);font-size:12.5px;color:var(--mid);margin:10px 0 0}
+  @media(max-width:560px){
+    .item,.colhead,.repair{grid-template-columns:1fr;gap:6px}
+    .mile{font-size:15px}
+    .mile small{display:inline;margin-left:8px}
+    .colhead .lab:last-child{display:none}
+    .line1{flex-wrap:wrap}
+    .due{width:100%;margin-left:15px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="lab">Service log</div>
+    <h1 class="title">2024 Jeep Grand Cherokee Summit</h1>
+    <div class="sub">3.6L Pentastar V6 · ZF 8HP75 · Quadra-Trac</div>
+
+    <div class="odo-block">
+      <div class="odo-field">
+        <span class="lab">Odometer</span>
+        <input class="odo" id="odo" type="number" inputmode="numeric" min="0" max="999999" value="28000">
+      </div>
+      <div class="setting">
+        <span class="lab">Driving conditions</span>
+        <select id="duty">
+          <option value="normal">Normal — highway, no towing</option>
+          <option value="severe" selected>Severe — short trips, heat, towing</option>
+        </select>
+      </div>
+      <div class="setting">
+        <span class="lab">In service since</span>
+        <input type="date" id="inservice" value="2024-01-15">
+      </div>
+    </div>
+    <div class="rate" id="rate"></div>
+  </header>
+
+  <div id="banner"></div>
+  <div class="tally" id="tally"></div>
+  <div id="list"></div>
+
+  <h2 class="sec">Repairs &amp; other work</h2>
+  <div id="repairs"></div>
+
+  <footer>
+    <div class="foot-actions">
+      <button class="link" id="ics">Add reminders to calendar</button>
+      <button class="link" id="backup">Download backup</button>
+      <button class="link" id="restoreBtn">Restore from backup</button>
+      <button class="link" id="export">Copy record as text</button>
+      <button class="link d" id="reset">Clear everything</button>
+      <input type="file" id="restoreFile" accept=".json" hidden>
+    </div>
+    <div id="savestate" style="font-size:12px;margin:-8px 0 16px;color:var(--faint)">All changes saved</div>
+    Intervals follow the Jeep schedule for the 2024 WL with the 3.6L Pentastar V6, with conservative
+    adjustments where real-world wear runs ahead of the book. <b>Severe duty</b> is Jeep's Schedule B —
+    short trips, stop-and-go, towing, dust, or heavy idling; most owners qualify. Items marked
+    <b>Critical</b> risk engine, brake, or safety damage if skipped. Your records live in this browser,
+    so download a backup now and then.
+  </footer>
+</div>
+
+<script>
+const KEY='gc-summit-2024-service-v1';
+
+/* Works in two places: inside a Claude artifact (window.storage) and as a normal
+   web page on GitHub Pages (localStorage). Whichever exists is used. */
+const store={
+  available(){
+    if(window.storage && typeof window.storage.set==='function') return true;
+    try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; }catch(e){ return false; }
+  },
+  async get(k){
+    if(window.storage && typeof window.storage.get==='function') return await window.storage.get(k);
+    const v=localStorage.getItem(k);
+    return v==null? null : {key:k,value:v};
+  },
+  async set(k,v){
+    if(window.storage && typeof window.storage.set==='function') return await window.storage.set(k,v);
+    localStorage.setItem(k,v); return {key:k,value:v};
+  }
+};
+
+const RATING={critical:{label:'Critical',color:'#A33224'},high:{label:'High',color:'#AF7A1E'},
+  medium:{label:'Medium',color:'#4F6E82'},low:{label:'Low',color:'#4E6B3D'}};
+const LEVEL={over:{c:'#A33224',t:'Overdue'},soon:{c:'#AF7A1E',t:'Due soon'},ok:{c:'#4E6B3D',t:'Up to date'}};
+
+const SCHEDULE=[
+  {id:'oil',n:'Engine oil & filter',mi:10000,sev:5000,mo:12,r:'critical',
+   s:'0W-20 full synthetic, MS-6395 · ~6.0 qt · filter MO-899',
+   d:'The most important item here. The oil-life monitor can stretch past 10k on highway miles; on severe duty do not exceed 5,000.'},
+  {id:'rotate',n:'Tire rotation',mi:10000,sev:7500,r:'high',s:'Torque lugs to 130 lb-ft, star pattern',
+   d:'Same-size tires front and rear, so a straight front-to-rear rotation works. Skipping it wears out a $1,400 tire set early.'},
+  {id:'brakeinsp',n:'Brake inspection — pads, rotors, lines',mi:10000,r:'critical',
+   d:'Visual check with every rotation. This truck is heavy; front pads commonly need replacing between 30k and 45k on severe duty.'},
+  {id:'tires',n:'Tire pressure & tread depth',mi:5000,mo:1,r:'medium',s:'Cold pressure per driver-door placard',
+   d:'Check with a gauge, not the dash. TPMS will not catch a slow leak early enough to save the tire.'},
+  {id:'cabin',n:'Cabin air filter',mi:20000,sev:15000,mo:12,r:'medium',s:'Behind the glovebox · 10 minute job',
+   d:'Cheap and easy. A clogged filter strains the blower motor and makes the A/C smell.'},
+  {id:'engair',n:'Engine air filter',mi:30000,sev:20000,r:'medium',s:'Inspect at 15k; replace when light no longer passes through',
+   d:'Gravel and dust cut this interval in half. A restricted intake costs fuel economy first, then power.'},
+  {id:'brakefluid',n:'Brake fluid flush',mo:36,r:'high',s:'DOT 3 · time-based, not mileage-based',
+   d:'Brake fluid absorbs moisture from the air no matter how far you drive. Wet fluid boils under hard braking and the pedal goes long.'},
+  {id:'coolant',n:'Engine coolant (OAT)',mi:150000,mo:120,r:'high',s:'MS-90032 OAT · do not mix with HOAT',
+   d:'Long-life coolant. Check the level at every oil change; the actual flush is a long way out.'},
+  {id:'trans',n:'Transmission fluid & filter',mi:120000,sev:60000,r:'high',s:'ZF Lifeguard 8 / MS-13108',
+   d:'Jeep calls it fill-for-life. It is not. If you tow or sit in traffic, change it at 60k — a rebuild is a five-figure repair.'},
+  {id:'tcase',n:'Transfer case fluid',mi:120000,sev:60000,r:'medium',s:'ATF+4 or NV spec per case',
+   d:'Change it any time the case has been submerged, regardless of mileage.'},
+  {id:'axles',n:'Front & rear axle fluid',mi:120000,sev:60000,r:'medium',s:'75W-85 synthetic gear oil',
+   d:'Required at 60k if you tow. Otherwise inspect for seepage at each oil change.'},
+  {id:'plugs',n:'Spark plugs',mi:100000,r:'high',s:'Pentastar V6 · 6 plugs · torque carefully into aluminum heads',
+   d:'Worn plugs show as a rough idle or misfire code long before they strand you, but the ignition coils pay for the wait.'},
+  {id:'belt',n:'Accessory drive belt',mi:100000,r:'medium',s:'Inspect at 60k for glazing and cracks',
+   d:'A shredded belt takes out the water pump drive and the charging system at the same time.'},
+  {id:'pcv',n:'PCV valve',mi:100000,r:'low',
+   d:'Pentastar PCV valves are known to fail into an oil-consumption complaint. Worth doing alongside the plugs.'},
+
+  {id:'brakesfront',n:'Front brake pads & rotors — replace',mi:45000,sev:38000,r:'critical',wear:true,
+   s:'Wear item · budget for rotors with the pads on this weight',
+   d:'Not a fixed interval — it depends on how you drive. On a 5,000 lb truck, front pads on severe duty typically go between 35k and 45k. The inspection at every rotation is what tells you the real number; log it here when you replace them.'},
+  {id:'brakesrear',n:'Rear brake pads & rotors — replace',mi:60000,sev:52000,r:'high',wear:true,
+   s:'Wear item · rears usually last about 1.4x the fronts',
+   d:'Rears wear slower but the electric parking brake actuator makes the job fussier. Do not let them go metal-to-metal.'},
+  {id:'tiresrep',n:'Tires — replace',mi:50000,sev:42000,r:'critical',wear:true,
+   s:'OE Pirelli Scorpion · 4/32" is the practical replace point, 2/32" is legal minimum',
+   d:'Judge by tread depth, not mileage. Rotating on schedule is what gets you to the high end of this window. Replace all four on a full-time 4WD system.'},
+  {id:'batteryrep',n:'Battery — replace',mo:60,mi:70000,r:'high',wear:true,
+   s:'Main AGM plus the auxiliary battery if equipped',
+   d:'Four to five years is typical, less in Arkansas heat. Replace it on your schedule rather than in a parking lot.'},
+  {id:'shocks',n:'Air struts & compressor — inspect',mi:50000,r:'medium',
+   s:'Check ride height, listen for the compressor cycling often',
+   d:'Quadra-Lift air struts start weeping around this range. A leaking strut makes the compressor run constantly until it burns out, which turns a one-corner repair into two.'},
+  {id:'oilhousing',n:'Oil filter housing & cooler — inspect for leaks',mi:60000,r:'high',
+   s:'Known Pentastar wear point · plastic housing warps',
+   d:'A classic 3.6L failure. It seeps oil and coolant where they meet. Catching a weep early is a gasket; ignoring it means a tow.'},
+  {id:'hoses',n:'Coolant hoses, belt & tensioner — inspect',mi:60000,r:'medium',
+   s:'Squeeze hoses cold; look for glazing and cracks on the belt',
+   d:'Ten minutes with the hood up. Rubber ages on heat cycles, not miles, so a hot climate moves this earlier.'},
+  {id:'throttle',n:'Throttle body & intake cleaning',mi:60000,sev:50000,r:'low',
+   s:'Carbon buildup · use throttle body cleaner, not carb cleaner',
+   d:'Optional but it smooths out a rough idle and hesitation off the line on higher-mileage Pentastars.'},
+  {id:'bearings',n:'Wheel bearings & CV boots — inspect',mi:60000,r:'medium',
+   d:'Listen for a droning hum that changes when you steer, and check the boots for torn rubber slinging grease.'},
+
+  {id:'susp',n:'Suspension, steering & exhaust inspection',mi:20000,r:'medium',s:'Includes air-suspension bags, lines, compressor',
+   d:'Air suspension parts are expensive. Catching a leaking bag early saves the compressor.'},
+  {id:'align',n:'Alignment check',mi:20000,mo:24,r:'low',
+   d:'Also worth doing after a hard pothole hit or if the wheel sits off-center.'},
+  {id:'battery',n:'Battery load test',mo:12,r:'medium',s:'Two batteries if equipped with the auxiliary/ESS setup',
+   d:'A weak battery on this truck causes phantom electrical faults long before a no-start.'},
+  {id:'wipers',n:'Wiper blades',mo:12,r:'low',d:'Replace in the fall, before you need them.'},
+  {id:'ac',n:'A/C performance check',mo:24,r:'low',d:'A vent-temp check catches a slow refrigerant leak before the compressor runs dry.'}
+];
+
+let state={duty:'severe',odo:28000,inservice:'2024-01-15',log:{},repairs:[],odoHistory:[],hideBanner:false};
+let filter=null, open={}, formOpen={}, repairForm=false;
+
+const MS_DAY=86400000, MS_MONTH=MS_DAY*30.44;
+const fmt=n=>Math.round(n).toLocaleString('en-US');
+const today=()=>new Date().toISOString().slice(0,10);
+const money=n=>'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+/* ---------- storage ---------- */
+async function load(){
+  let stored=null;
+  if(store.available()){
+    try{ const r=await store.get(KEY); if(r&&r.value) stored=JSON.parse(r.value); }
+    catch(e){ /* nothing saved yet — normal on first run */ }
+  }else{
+    setSaveStatus('nostore');
+  }
+  if(stored) state=Object.assign(state,stored);
+  state.repairs=state.repairs||[]; state.odoHistory=state.odoHistory||[];
+  if(!state.seeded && !Object.keys(state.log).length){
+    state.log.oil=[{miles:18000,date:'2026-01-02',cost:null,shop:'',notes:'Starting record'}];
+    state.seeded=true;
+    save();
+  }
+  odo.value=state.odo; duty.value=state.duty; inservice.value=state.inservice;
+  render();
+  if(saveState==='idle') setSaveStatus('saved');
+}
+let saveTimer=null, savePending=false, saveState='idle';
+function save(){
+  savePending=true;
+  setSaveStatus('saving');
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(flush,600);   // one write per pause, not one per keystroke
+}
+async function flush(attempt=0){
+  if(!savePending) return;
+  savePending=false;
+  if(!store.available()){ setSaveStatus('nostore'); return; }
+  try{
+    await store.set(KEY,JSON.stringify(state));
+    setSaveStatus('saved');
+  }catch(e){
+    if(attempt<3){ savePending=true; setTimeout(()=>flush(attempt+1),800*(attempt+1)); return; }
+    setSaveStatus('failed');
+  }
+}
+function setSaveStatus(s){
+  saveState=s;
+  const el=document.getElementById('savestate');
+  if(!el) return;
+  if(s==='saved'){ el.textContent='All changes saved'; el.style.color='var(--faint)'; }
+  else if(s==='saving'){ el.textContent='Saving…'; el.style.color='var(--faint)'; }
+  else if(s==='nostore'){
+    el.innerHTML='Not saving — this copy is running without storage. Use <b>Download backup</b> to keep your records.';
+    el.style.color='var(--amber)';
+  }else{
+    el.innerHTML='Could not save. Use <b>Download backup</b> before closing this tab.';
+    el.style.color='var(--red)';
+  }
+}
+window.addEventListener('beforeunload',()=>{ if(savePending) flush(); });
+
+/* ---------- mileage rate ---------- */
+function noteOdo(){
+  const h=state.odoHistory, t=today();
+  if(h.length && h[h.length-1].date===t){ h[h.length-1].miles=state.odo; }
+  else h.push({miles:state.odo,date:t});
+  if(h.length>60) h.splice(0,h.length-60);
+}
+function milesPerDay(){
+  const h=state.odoHistory;
+  if(h.length>=2){
+    const a=h[0], b=h[h.length-1];
+    const days=(new Date(b.date)-new Date(a.date))/MS_DAY;
+    const miles=b.miles-a.miles;
+    if(days>=30 && miles>0) return miles/days;
+  }
+  const days=(new Date()-new Date(state.inservice))/MS_DAY;
+  if(days>60 && state.odo>0) return state.odo/days;
+  return 12000/365.25;
+}
+function whenText(milesLeft){
+  const d=milesLeft/milesPerDay();
+  if(d<=0) return null;
+  if(d<21) return `about ${Math.max(1,Math.round(d))} days out`;
+  if(d<70) return `about ${Math.round(d/7)} weeks out`;
+  if(d<365*1.5) return `about ${Math.round(d/30.44)} months out`;
+  return `about ${(d/365.25).toFixed(1)} years out`;
+}
+
+/* ---------- status ---------- */
+function ivMiles(it){return it.mi? (state.duty==='severe'&&it.sev? it.sev: it.mi) : null;}
+function lastEntry(it){const l=state.log[it.id]; return l&&l.length? l[l.length-1]:null;}
+function status(it){
+  const iv=ivMiles(it), last=lastEntry(it);
+  const baseMiles=last? last.miles:0;
+  const baseDate=last? new Date(last.date): new Date(state.inservice);
+  let milesLeft=null,dueAt=null;
+  if(iv){dueAt=baseMiles+iv; milesLeft=dueAt-state.odo;}
+  let monthsLeft=null,dueDate=null;
+  if(it.mo){dueDate=new Date(baseDate.getTime()+it.mo*MS_MONTH); monthsLeft=(dueDate-new Date())/MS_MONTH;}
+  const milePct=iv? milesLeft/iv:Infinity, timePct=it.mo? monthsLeft/it.mo:Infinity;
+  const pct=Math.min(milePct,timePct);
+  const level=pct<=0?'over':pct<=.12?'soon':'ok';
+  const byTime=timePct<milePct;
+  let sortMiles=dueAt;
+  if(byTime||!iv){
+    const est=state.odo+(monthsLeft*30.44)*milesPerDay();
+    sortMiles=(iv==null)?est:Math.min(dueAt,est);
+  }
+  return {level,milesLeft,dueAt,monthsLeft,dueDate,iv,last,byTime,sortMiles,estimated:(iv==null||byTime)};
+}
+
+let flashTimer;
+function flash(msg){
+  let t=document.getElementById('toast');
+  if(!t){ t=document.createElement('div'); t.id='toast'; document.body.appendChild(t); }
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(flashTimer);
+  flashTimer=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+/* ---------- render ---------- */
+function render(){
+  const counts={over:0,soon:0,ok:0};
+  const all=SCHEDULE.map(it=>{const st=status(it); counts[st.level]++; return {it,st};});
+  all.sort((a,b)=>a.st.sortMiles-b.st.sortMiles);
+
+  const mpd=milesPerDay();
+  rate.innerHTML=`You're averaging <b>${fmt(mpd*30.44)}</b> miles a month`+
+    (state.odoHistory.length>=2?` based on your odometer entries.`:` — estimated from the in-service date. Update the odometer now and then and this gets sharper.`);
+
+  banner.innerHTML='';
+  const logged=Object.keys(state.log).length;
+  if(!logged && !state.hideBanner){
+    banner.innerHTML=`<div class="banner"><button class="link q x" id="hideb">Dismiss</button>
+      <b>Start with what's already been done.</b> Every interval below is currently counting from zero miles,
+      so the dates are theoretical. Log your last oil change and tire rotation and the whole list becomes real.</div>`;
+    document.getElementById('hideb').onclick=()=>{state.hideBanner=true; save(); render();};
+  }
+
+  list.innerHTML='';
+  const head=document.createElement('div'); head.className='colhead';
+  head.innerHTML='<span class="lab">Due at odometer</span><span class="lab">Service</span>';
+  list.appendChild(head);
+  all.forEach(({it,st})=>{ if(filter&&st.level!==filter) return; list.appendChild(row(it,st)); });
+
+  tally.innerHTML='';
+  [['over','Overdue'],['soon','Due soon'],['ok','Up to date']].forEach(([k,label])=>{
+    const b=document.createElement('button'); b.className='chip';
+    b.setAttribute('aria-pressed',filter===k);
+    b.innerHTML=`<span class="dot" style="background:${LEVEL[k].c}"></span>${label}<span class="n">${counts[k]}</span>`;
+    b.onclick=()=>{filter=(filter===k?null:k); render();};
+    tally.appendChild(b);
+  });
+
+  renderRepairs();
+}
+
+function entryLine(e){
+  const bits=[];
+  if(e.est) bits.push('estimated mileage');
+  if(e.shop) bits.push(e.shop);
+  if(e.cost!=null&&e.cost!=='') bits.push(money(e.cost));
+  if(e.notes) bits.push(e.notes);
+  return bits.join(' · ');
+}
+const entryMiles=e=>(e.est?'~':'')+fmt(e.miles)+' mi';
+
+function row(it,st){
+  const el=document.createElement('div'); el.className='item';
+  const rate_=RATING[it.r], col=LEVEL[st.level].c;
+
+  let due = st.iv
+    ? (st.milesLeft<=0 ? (it.wear?`${fmt(-st.milesLeft)} mi past window`:`${fmt(-st.milesLeft)} mi past due`) : `${fmt(st.milesLeft)} mi left`)
+    : (st.monthsLeft<=0 ? 'Past due' : `${Math.round(st.monthsLeft)} mo left`);
+
+  const when = st.level==='over' ? null
+    : st.estimated ? (st.dueDate? `due ${st.dueDate.toLocaleDateString('en-US',{month:'short',year:'numeric'})}` : null)
+    : whenText(st.milesLeft);
+
+  const iv = it.wear
+    ? `Typically around ${fmt(st.iv||0)} mi — wear item, inspect to confirm`
+    : st.iv
+      ? `Every ${fmt(st.iv)} mi${it.mo?` or ${it.mo} mo`:''}${state.duty==='severe'&&it.sev?', severe duty':''}`
+      : `Every ${it.mo} months`;
+
+  const mileNum = st.estimated ? `~${fmt(st.sortMiles)}` : fmt(st.dueAt);
+  const mileNote = it.wear ? (st.level==='over'?'Expect now':'Expect near')
+    : st.level==='over' ? 'Overdue' : st.estimated ? 'Estimated' : 'Miles';
+
+  const entries=state.log[it.id]||[];
+  const entriesHtml = entries.length
+    ? entries.map((e,i)=>`<div class="entry"><span class="m">${entryMiles(e)}</span>
+        <span>${new Date(e.date).toLocaleDateString('en-US')}${entryLine(e)?' — '+entryLine(e):''}</span>
+        <button class="link d rm" data-del="${i}">Remove</button></div>`).join('')
+    : '<div class="entry" style="color:var(--faint)">Nothing logged yet.</div>';
+
+  el.innerHTML=`
+   <div class="mile" style="color:${col}">${mileNum}<small style="color:${st.level==='over'?col:'var(--faint)'}">${mileNote}</small></div>
+   <div>
+    <div class="line1">
+      <span class="dot" style="background:${col}"></span>
+      <span class="name">${it.n}</span>
+      <span class="due" style="color:${col}">${due}</span>
+    </div>
+    <div class="line2">
+      <span class="rating" style="color:${rate_.color}">${rate_.label}</span>
+      <span class="sep">·</span><span>${iv}</span>
+      ${when?`<span class="sep">·</span><span>${when}</span>`:''}
+    </div>
+    <div class="actions">
+      <button class="link strong" data-quick>Done &mdash; check it off</button>
+      <button class="link" data-do>${formOpen[it.id]?'Cancel':'Log with details'}</button>
+      ${st.last?'<button class="link q" data-undo>Undo last</button>':''}
+      <button class="link q" data-more>${open[it.id]?'Hide details':'Details & history'}</button>
+    </div>
+    ${formOpen[it.id]?formHtml(it.id):''}
+    ${open[it.id]?`<div class="panel"><div class="detail">${it.d}
+      ${it.s?`<div class="spec">${it.s}</div>`:''}</div>
+      <div class="entries">${entriesHtml}</div></div>`:''}
+   </div>`;
+
+  el.querySelector('[data-quick]').onclick=()=>{
+    (state.log[it.id]=state.log[it.id]||[]).push({miles:state.odo,date:today(),cost:null,shop:'',notes:'',quick:true});
+    state.log[it.id].sort((a,b)=>a.miles-b.miles);
+    formOpen[it.id]=false; save(); render();
+    flash(`${it.n} logged at ${fmt(state.odo)} miles.`);
+  };
+  const ub=el.querySelector('[data-undo]');
+  if(ub) ub.onclick=()=>{
+    const l=state.log[it.id]; if(!l||!l.length) return;
+    const e=l.pop(); if(!l.length) delete state.log[it.id];
+    save(); render(); flash(`Removed the ${fmt(e.miles)} mile entry for ${it.n}.`);
+  };
+  el.querySelector('[data-do]').onclick=()=>{formOpen[it.id]=!formOpen[it.id]; render();};
+  el.querySelector('[data-more]').onclick=()=>{open[it.id]=!open[it.id]; render();};
+  el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    if(!confirm('Remove this entry?')) return;
+    state.log[it.id].splice(+b.dataset.del,1);
+    if(!state.log[it.id].length) delete state.log[it.id];
+    save(); render();
+  });
+  if(formOpen[it.id]) wireForm(el,it.id);
+  return el;
+}
+
+function formHtml(id){
+  return `<div class="panel"><div class="form">
+    <div class="f"><label for="m-${id}">Odometer</label><input type="number" id="m-${id}" value="${state.odo}"></div>
+    <div class="f"><label for="d-${id}">Date</label><input type="date" id="d-${id}" value="${today()}"></div>
+    <div class="f"><label for="c-${id}">Cost</label><input type="number" step="0.01" id="c-${id}" placeholder="0.00"></div>
+    <div class="f"><label for="s-${id}">Shop or "did it myself"</label><input type="text" id="s-${id}" placeholder="Optional"></div>
+    <div class="f wide check"><label class="cb"><input type="checkbox" id="e-${id}">
+      Mileage is an estimate — I don't remember exactly</label></div>
+    <div class="f wide"><label for="n-${id}">Parts, invoice number, notes</label><textarea id="n-${id}" placeholder="Optional"></textarea></div>
+    <div class="form-actions">
+      <button class="btn" id="save-${id}">Save entry</button>
+      <button class="btn ghost" id="cancel-${id}">Cancel</button>
+    </div>
+  </div></div>`;
+}
+function wireForm(el,id){
+  el.querySelector('#save-'+id).onclick=()=>{
+    const miles=parseInt(el.querySelector('#m-'+id).value,10);
+    const date=el.querySelector('#d-'+id).value;
+    if(isNaN(miles)||!date){alert('Enter an odometer reading and a date.');return;}
+    const cost=el.querySelector('#c-'+id).value;
+    (state.log[id]=state.log[id]||[]).push({
+      miles,date,cost:cost===''?null:parseFloat(cost),
+      est:el.querySelector('#e-'+id).checked,
+      shop:el.querySelector('#s-'+id).value.trim(),
+      notes:el.querySelector('#n-'+id).value.trim()
+    });
+    state.log[id].sort((a,b)=>a.miles-b.miles);
+    formOpen[id]=false; save(); render();
+  };
+  el.querySelector('#cancel-'+id).onclick=()=>{formOpen[id]=false; render();};
+}
+
+/* ---------- repairs ---------- */
+function renderRepairs(){
+  const box=document.getElementById('repairs');
+  const list_=[...state.repairs].sort((a,b)=>b.miles-a.miles);
+  let html=`<div class="actions" style="margin:12px 0 0">
+      <button class="link" id="addRepair">${repairForm?'Cancel':'Add a repair'}</button></div>`;
+  if(repairForm) html+=`<div class="panel" style="margin-left:0"><div class="form">
+    <div class="f wide"><label for="rt">What was done</label><input type="text" id="rt" placeholder="Front brake pads and rotors"></div>
+    <div class="f"><label for="rm">Odometer</label><input type="number" id="rm" value="${state.odo}"></div>
+    <div class="f"><label for="rd">Date</label><input type="date" id="rd" value="${today()}"></div>
+    <div class="f"><label for="rc">Cost</label><input type="number" step="0.01" id="rc" placeholder="0.00"></div>
+    <div class="f"><label for="rs">Shop</label><input type="text" id="rs" placeholder="Optional"></div>
+    <div class="f wide check"><label class="cb"><input type="checkbox" id="re"> Mileage is an estimate</label></div>
+    <div class="f wide"><label for="rn">Notes</label><textarea id="rn" placeholder="Optional"></textarea></div>
+    <div class="form-actions"><button class="btn" id="rsave">Save repair</button>
+      <button class="btn ghost" id="rcancel">Cancel</button></div></div></div>`;
+
+  html += list_.length
+    ? list_.map(r=>`<div class="repair">
+        <div class="m">${r.est?"~":""}${fmt(r.miles)}<small>${new Date(r.date).toLocaleDateString('en-US')}</small></div>
+        <div><div class="t">${r.title}</div>
+          ${entryLine(r)?`<div class="n">${entryLine(r)}</div>`:''}</div>
+        <button class="link d" data-rdel="${r.uid}">Remove</button></div>`).join('')
+    : `<div class="repair" style="color:var(--faint)"><div class="m">—</div><div>No repairs recorded. Anything outside the maintenance schedule goes here — a patched tire, a battery, a recall.</div><div></div></div>`;
+
+  const spent=[...state.repairs,...Object.values(state.log).flat()]
+    .reduce((s,e)=>s+(Number(e.cost)||0),0);
+  if(spent>0) html+=`<div class="totals">Total recorded spend: ${money(spent)}</div>`;
+
+  box.innerHTML=html;
+  document.getElementById('addRepair').onclick=()=>{repairForm=!repairForm; render();};
+  if(repairForm){
+    document.getElementById('rsave').onclick=()=>{
+      const title=document.getElementById('rt').value.trim();
+      const miles=parseInt(document.getElementById('rm').value,10);
+      const date=document.getElementById('rd').value;
+      if(!title||isNaN(miles)||!date){alert('Enter what was done, the odometer reading, and a date.');return;}
+      const cost=document.getElementById('rc').value;
+      state.repairs.push({uid:String(Date.now()),title,miles,date,
+        est:document.getElementById('re').checked,
+        cost:cost===''?null:parseFloat(cost),
+        shop:document.getElementById('rs').value.trim(),
+        notes:document.getElementById('rn').value.trim()});
+      repairForm=false; save(); render();
+    };
+    document.getElementById('rcancel').onclick=()=>{repairForm=false; render();};
+  }
+  box.querySelectorAll('[data-rdel]').forEach(b=>b.onclick=()=>{
+    if(!confirm('Remove this repair?')) return;
+    state.repairs=state.repairs.filter(r=>r.uid!==b.dataset.rdel);
+    save(); render();
+  });
+}
+
+/* ---------- inputs ---------- */
+let odoTimer;
+odo.addEventListener('input',e=>{
+  const v=parseInt(e.target.value,10); state.odo=isNaN(v)?0:v;
+  render();
+  clearTimeout(odoTimer);
+  odoTimer=setTimeout(()=>{ noteOdo(); save(); },900);
+});
+duty.addEventListener('change',e=>{state.duty=e.target.value; save(); render();});
+inservice.addEventListener('change',e=>{state.inservice=e.target.value; save(); render();});
+
+/* ---------- footer actions ---------- */
+document.getElementById('reset').onclick=()=>{
+  if(!confirm('Erase all logged services, repairs, and odometer history? This cannot be undone.')) return;
+  state.log={}; state.repairs=[]; state.odoHistory=[]; save(); render();
+};
+document.getElementById('export').onclick=()=>{
+  let out=`2024 Jeep Grand Cherokee Summit — service record\nOdometer: ${fmt(state.odo)} mi · ${new Date().toLocaleDateString('en-US')}\n\nSCHEDULED MAINTENANCE\n`;
+  SCHEDULE.forEach(it=>{
+    const l=state.log[it.id]; if(!l) return;
+    out+=`\n${it.n}\n`+l.map(e=>`   ${entryMiles(e)} · ${e.date}${entryLine(e)?' · '+entryLine(e):''}`).join('\n')+'\n';
+  });
+  if(state.repairs.length){
+    out+=`\nREPAIRS & OTHER WORK\n`;
+    [...state.repairs].sort((a,b)=>a.miles-b.miles).forEach(r=>{
+      out+=`   ${r.est?"~":""}${fmt(r.miles)} mi · ${r.date} · ${r.title}${entryLine(r)?' · '+entryLine(r):''}\n`;});
+  }
+  navigator.clipboard.writeText(out).then(()=>{
+    const b=document.getElementById('export'); b.textContent='Copied';
+    setTimeout(()=>b.textContent='Copy record as text',1500);
+  },()=>alert(out));
+};
+function download(name,text,type){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type}));
+  a.download=name; a.click(); URL.revokeObjectURL(a.href);
+}
+document.getElementById('backup').onclick=()=>{
+  download(`grand-cherokee-service-${today()}.json`,JSON.stringify(state,null,2),'application/json');
+};
+document.getElementById('restoreBtn').onclick=()=>document.getElementById('restoreFile').click();
+document.getElementById('restoreFile').addEventListener('change',ev=>{
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const data=JSON.parse(r.result);
+      if(!data.log) throw new Error('bad file');
+      if(!confirm('Replace your current records with this backup?')) return;
+      state=Object.assign(state,data);
+      odo.value=state.odo; duty.value=state.duty; inservice.value=state.inservice;
+      save(); render();
+    }catch(e){ alert('That file could not be read as a service backup.'); }
+  };
+  r.readAsText(f); ev.target.value='';
+});
+document.getElementById('ics').onclick=()=>{
+  const pad=n=>String(n).padStart(2,'0');
+  const stamp=d=>`${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}`;
+  let ics='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Grand Cherokee Service Log//EN\r\nCALSCALE:GREGORIAN\r\n';
+  let n=0;
+  SCHEDULE.forEach(it=>{
+    const st=status(it);
+    let when;
+    if(st.level==='over') when=new Date(Date.now()+3*MS_DAY);
+    else if(st.estimated&&st.dueDate) when=st.dueDate;
+    else when=new Date(Date.now()+(st.milesLeft/milesPerDay())*MS_DAY);
+    if(!(when instanceof Date)||isNaN(when)) return;
+    if(when-Date.now() > 3*365.25*MS_DAY) return;   // skip the far-future stuff
+    n++;
+    const end=new Date(when.getTime()+MS_DAY);
+    ics+='BEGIN:VEVENT\r\n'
+      +`UID:gc-${it.id}-${stamp(when)}@servicelog\r\n`
+      +`DTSTAMP:${stamp(new Date())}T000000Z\r\n`
+      +`DTSTART;VALUE=DATE:${stamp(when)}\r\nDTEND;VALUE=DATE:${stamp(end)}\r\n`
+      +`SUMMARY:Jeep — ${it.n}\r\n`
+      +`DESCRIPTION:${RATING[it.r].label} priority. ${st.dueAt?'Due at '+fmt(st.dueAt)+' miles. ':''}Projected from your current mileage rate.\r\n`
+      +'BEGIN:VALARM\r\nTRIGGER:-P7D\r\nACTION:DISPLAY\r\nDESCRIPTION:Jeep service coming up\r\nEND:VALARM\r\n'
+      +'END:VEVENT\r\n';
+  });
+  ics+='END:VCALENDAR\r\n';
+  download('jeep-service-reminders.ics',ics,'text/calendar');
+};
+
+load();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
