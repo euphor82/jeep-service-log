@@ -25,6 +25,7 @@
     --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
   }
   *{box-sizing:border-box}
+  [hidden]{display:none !important}
   html,body{margin:0;padding:0}
   body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
   .wrap{max-width:860px;margin:0 auto;padding:0 20px 90px}
@@ -181,14 +182,74 @@
   /* ---- settings ---- */
   .set-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin:8px 0 4px}
   #tab-settings .foot-actions{margin-top:8px}
+
+  /* ---- next-service sticker ---- */
+  .stick{border:1px solid var(--rule);border-radius:10px;padding:14px 16px;margin:2px 0 6px;
+    background:#fff;position:relative}
+  .stick.add{width:100%;text-align:left;cursor:pointer;color:var(--slate);font-family:var(--body);
+    font-size:13.5px;font-weight:500;border-style:dashed;background:transparent}
+  .stick.add:hover{border-color:var(--slate)}
+  .stick-top{display:flex;justify-content:space-between;align-items:center}
+  .stick-h{font-family:var(--display);text-transform:uppercase;letter-spacing:.18em;font-size:11px;color:var(--faint)}
+  .stick-acts .link{margin-left:14px}
+  .stick-label{font-weight:600;font-size:15px;margin-top:6px}
+  .stick-target{font-family:var(--mono);font-size:14px;color:var(--mid);margin-top:4px}
+  .stick-cd{font-family:var(--mono);font-weight:600;font-size:22px;letter-spacing:-.01em;margin-top:8px;color:var(--green)}
+  .stick.due{border-left:4px solid var(--red);background:#fdf6f4}
+  .stick.due .stick-cd{color:var(--red)}
+  .stick.ok{border-left:4px solid var(--slate)}
+  .stick.edit .form{margin-top:10px}
+  .stick.edit .stick-h{margin-bottom:2px;display:block}
+
+  /* ---- row edit/remove actions & inline edit panel ---- */
+  .rowacts{display:flex;flex-direction:column;gap:5px;align-items:flex-end;white-space:nowrap}
+  .editpanel{grid-column:1 / -1;margin:10px 0 2px}
+
+  /* ---- vehicle switcher ---- */
+  header{position:relative}
+  .vehsel{display:flex;align-items:center;gap:12px;background:none;border:0;cursor:pointer;
+    padding:0;text-align:left;width:100%}
+  .vehsel .vehtxt{display:flex;flex-direction:column;min-width:0}
+  .vehsel .title{font-family:var(--display);font-size:24px;font-weight:600;line-height:1.1;color:var(--ink)}
+  .vehsel .sub{color:var(--mid);font-size:13px;margin-top:2px}
+  .vehsel .chev{margin-left:auto;color:var(--faint);font-size:16px;flex:none}
+  .vehmenu{position:absolute;left:0;right:0;top:100%;z-index:30;margin-top:8px;
+    background:#fff;border:1px solid var(--rule);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.12);
+    overflow:hidden}
+  .vehmenu button{display:flex;width:100%;align-items:center;gap:10px;background:none;border:0;
+    cursor:pointer;padding:12px 14px;text-align:left;font-family:var(--body);font-size:14px;color:var(--ink);
+    border-bottom:1px solid var(--rule-2)}
+  .vehmenu button:hover{background:var(--rule-2)}
+  .vehmenu button.on{font-weight:600}
+  .vehmenu button .vm-sub{display:block;font-size:12px;color:var(--faint);font-weight:400;margin-top:1px}
+  .vehmenu .vm-check{margin-left:auto;color:var(--slate)}
+  .vehmenu .vm-act{color:var(--slate);font-weight:500}
+
+  /* ---- modal ---- */
+  .overlay{position:fixed;inset:0;z-index:60;background:rgba(20,22,24,.4);
+    display:flex;align-items:flex-end;justify-content:center;padding:0}
+  .modal{background:var(--paper);width:100%;max-width:520px;border-radius:14px 14px 0 0;
+    padding:20px 18px calc(24px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}
+  @media(min-width:560px){.overlay{align-items:center}.modal{border-radius:14px}}
+  .modal h3{font-family:var(--display);text-transform:uppercase;letter-spacing:.14em;font-size:13px;
+    color:var(--mid);margin:0 0 14px}
+  .modal .vrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--rule-2)}
+  .modal .vrow .nm{flex:1;min-width:0}
+  .modal .vrow .nm b{font-weight:600} .modal .vrow .nm span{display:block;font-size:12px;color:var(--faint)}
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <header>
-    <h1 class="title">2024 Grand Cherokee Summit</h1>
-    <div class="sub">3.6L Pentastar V6 · Service log</div>
+    <button class="vehsel" id="vehSwitch">
+      <span class="vehtxt">
+        <span class="title" id="vehName">Vehicle</span>
+        <span class="sub" id="vehSub">Service log</span>
+      </span>
+      <span class="chev">&#9662;</span>
+    </button>
+    <div class="vehmenu" id="vehMenu" hidden></div>
   </header>
 
   <!-- ============ DUE ============ -->
@@ -200,6 +261,7 @@
       </div>
       <div class="rate" id="rate"></div>
     </div>
+    <div id="sticker"></div>
     <div id="nextup"></div>
     <div id="banner"></div>
     <div class="tally" id="tally"></div>
@@ -277,6 +339,8 @@
     <button data-tab="history"><span class="ic">&#10003;</span>History</button>
     <button data-tab="settings"><span class="ic">&#9881;</span>Settings</button>
   </nav>
+
+  <div class="overlay" id="overlay" hidden><div class="modal" id="modal"></div></div>
 </div>
 
 <script>
@@ -305,9 +369,9 @@ const RATING={critical:{label:'Critical',color:'#A33224'},high:{label:'High',col
 const LEVEL={over:{c:'#A33224',t:'Overdue'},soon:{c:'#AF7A1E',t:'Due soon'},ok:{c:'#4E6B3D',t:'Up to date'}};
 
 const SCHEDULE=[
-  {id:'oil',n:'Engine oil & filter',mi:10000,sev:5000,mo:12,r:'critical',
+  {id:'oil',n:'Engine oil & filter',mi:7500,sev:7500,mo:12,r:'critical',
    s:'0W-20 full synthetic, MS-6395 · ~6.0 qt · filter MO-899',
-   d:'The most important item here. The oil-life monitor can stretch past 10k on highway miles; on severe duty do not exceed 5,000.'},
+   d:'The most important item here. Set to a 7,500-mile interval — the app counts the next change from whenever you last logged one. The oil-life monitor can read longer on highway miles, but 7,500 keeps a margin.'},
   {id:'rotate',n:'Tire rotation',mi:10000,sev:7500,r:'high',s:'Torque lugs to 130 lb-ft, star pattern',
    d:'Same-size tires front and rear, so a straight front-to-rear rotation works. Skipping it wears out a $1,400 tire set early.'},
   {id:'brakeinsp',n:'Brake inspection — pads, rotors, lines',mi:10000,r:'critical',
@@ -413,11 +477,142 @@ const DIY={
   pro:{label:'Best at a shop', color:'#AF7A1E'}
 };
 
-let state={duty:'severe',odo:28000,inservice:'2024-01-15',log:{},repairs:[],odoHistory:[],hideBanner:false};
+/* =========================================================================
+   2022 Hyundai Palisade Calligraphy AWD — 3.8L Lambda II V6, 8-speed auto, HTRAC
+   Intervals from Hyundai's maintenance schedule; severe = Hyundai's severe service.
+   ========================================================================= */
+const PALISADE=[
+  {id:'oil',n:'Engine oil & filter',mi:7500,sev:3750,mo:12,r:'critical',
+   s:'0W-20, API SP / ILSAC GF-6 · ~6.3 qt · cartridge filter 26350-3CAA0',
+   d:'Lambda II V6. Hyundai\'s severe interval is 3,750 miles — short trips and heat put you there. Keep receipts; oil records matter for Hyundai\'s powertrain warranty.',
+   shop:'$70–100', self:'~$45 parts', diy:'maybe'},
+  {id:'rotate',n:'Tire rotation',mi:7500,r:'high',s:'Torque to 100 lb-ft · Calligraphy runs 20-inch wheels',
+   d:'Front-to-rear rotation. Staying on schedule is what gets a $1,200+ tire set to its full life.',
+   shop:'$25–50', self:'free with a jack & torque wrench', diy:'maybe'},
+  {id:'brakeinsp',n:'Brake inspection — pads, rotors, lines',mi:7500,r:'critical',
+   d:'Visual check with every rotation. Front pads on this 4,300 lb SUV typically need attention between 30k and 45k on severe duty.',
+   shop:'often free', self:'free', diy:'diy'},
+  {id:'tires',n:'Tire pressure & tread depth',mi:5000,mo:1,r:'medium',s:'Cold pressure per driver-door placard',
+   d:'Check with a gauge. The 20-inch Calligraphy tires are low-profile and show curb and pothole damage sooner.',
+   shop:'free', self:'free', diy:'diy'},
+  {id:'cabin',n:'Cabin air filter',mi:15000,sev:7500,mo:12,r:'medium',s:'Behind the glovebox · 10 minute job',
+   d:'Easy DIY. A clogged filter weakens airflow and lets the A/C smell musty.',
+   shop:'$40–60', self:'~$18 parts', diy:'diy'},
+  {id:'engair',n:'Engine air filter',mi:30000,sev:15000,r:'medium',s:'Inspect at 15k',
+   d:'Dust and gravel roads halve this. A restricted intake costs fuel economy first.',
+   shop:'$45–70', self:'~$25 parts', diy:'diy'},
+  {id:'brakefluid',n:'Brake fluid flush',mo:24,r:'high',s:'DOT 4 · time-based',
+   d:'Hyundai calls for a roughly two-year change. Fluid absorbs moisture regardless of miles; wet fluid fades under hard braking.',
+   shop:'$110–150', self:'~$18 parts', diy:'pro'},
+  {id:'coolant',n:'Engine coolant',mi:120000,mo:120,r:'high',s:'Hyundai Long Life Coolant (phosphate OAT, pink) · do not mix',
+   d:'First change at 120k or 10 years, then every 30k after. Check the level at each oil change; use only Hyundai\'s coolant to protect the water pump and heater core.',
+   shop:'$130–200', self:'~$40 parts', diy:'pro'},
+  {id:'trans',n:'Automatic transmission fluid',mi:100000,sev:60000,r:'high',s:'Hyundai ATF SP-IV RR only',
+   d:'Hyundai labels it long-life, but on a heavy AWD SUV that tows or sits in traffic, a 60k drain-and-fill is cheap insurance against a costly transmission.',
+   shop:'$250–450', self:'~$120 parts', diy:'pro'},
+  {id:'awd',n:'AWD coupling & rear differential fluid',mi:100000,sev:60000,r:'medium',s:'Hyundai PTU / rear differential oil per spec',
+   d:'HTRAC all-wheel drive adds a power-transfer unit and a rear coupling. Change the fluid at 60k if you tow or drive dirt roads; sooner if it\'s ever been submerged.',
+   shop:'$150–250', self:'~$60 parts', diy:'maybe'},
+  {id:'plugs',n:'Spark plugs',mi:100000,r:'high',s:'Iridium · 6 plugs · rear bank sits under the intake',
+   d:'Long-life iridium plugs. The rear three are behind the intake manifold on this transverse V6, which is most of the labor cost.',
+   shop:'$300–450', self:'~$80 parts', diy:'pro'},
+  {id:'belt',n:'Accessory drive belt',mi:90000,r:'medium',s:'Inspect at 60k for glazing and cracks',
+   d:'One serpentine belt runs everything. A failure strands the charging system and water pump at once.',
+   shop:'$120–180', self:'~$50 parts', diy:'maybe'},
+  {id:'batteryrep',n:'12V battery — replace',mo:54,mi:60000,r:'high',wear:true,
+   s:'Group 47/H5 · Arkansas heat shortens battery life',
+   d:'Four to five years is typical, less in the heat. A weak battery on this vehicle triggers odd electronic warnings before it fails to start.',
+   shop:'$200–300', self:'~$180 parts', diy:'maybe'},
+  {id:'brakesfront',n:'Front brake pads & rotors — replace',mi:45000,sev:35000,r:'critical',wear:true,
+   s:'Wear item · plan for rotors with the pads',
+   d:'Not a fixed interval — it tracks how you drive. On a heavy SUV, front pads on severe duty usually go 30k–45k. The rotation-time inspection tells you the real number.',
+   shop:'$300–500', self:'~$160 parts', diy:'maybe'},
+  {id:'brakesrear',n:'Rear brake pads & rotors — replace',mi:55000,sev:45000,r:'high',wear:true,
+   s:'Wear item · electric parking brake must be retracted electronically',
+   d:'The rear calipers use the electronic parking brake; they have to be put in service mode with a scan tool before a pad change, which is why it\'s a shop job for most.',
+   shop:'$300–500', self:'~$170 parts', diy:'pro'},
+  {id:'tiresrep',n:'Tires — replace',mi:45000,sev:38000,r:'critical',wear:true,
+   s:'245/50R20 on Calligraphy · 4/32" practical replace point',
+   d:'Judge by tread depth, not miles. Rotating on schedule reaches the high end of this window. Replace all four on the AWD system to avoid driveline strain.',
+   shop:'$1,000–1,500 installed', self:'—', diy:'pro'},
+  {id:'susp',n:'Suspension, steering & exhaust inspection',mi:15000,r:'medium',
+   d:'Check for worn bushings, leaking struts, and loose steering components at each service.',
+   shop:'$0–120', self:'free to inspect', diy:'diy'},
+  {id:'align',n:'Alignment check',mi:20000,mo:24,r:'low',
+   d:'Also worth doing after a hard pothole or if the wheel sits off-center. Protects those expensive 20-inch tires.',
+   shop:'$100–180', self:'—', diy:'pro'},
+  {id:'wipers',n:'Wiper blades',mo:12,r:'low',d:'Replace before winter and before pollen season.',
+   shop:'$25–50', self:'~$30 parts', diy:'diy'},
+  {id:'ac',n:'A/C performance check',mo:24,r:'low',d:'A vent-temp check catches a slow refrigerant leak before the compressor is damaged.',
+   shop:'$0–120', self:'—', diy:'maybe'},
+  {id:'recall-hitch',n:'Recall 22V-633 — tow hitch harness (fire risk)',once:true,r:'critical',
+   s:'Only if equipped with the genuine Hyundai tow hitch harness',
+   d:'NHTSA recall 22V-633: debris and moisture on the tow-hitch harness board can short and cause a fire, even parked. If your Palisade has the factory/dealer tow hitch, the dealer inspects and repairs it free. Check it once and mark this done.',
+   shop:'free at dealer', self:'—', diy:'pro'},
+  {id:'recall-airbag',n:'Recall — 3rd-row side curtain airbag',once:true,r:'high',
+   s:'2020–2025 Palisade · FMVSS 226',
+   d:'The third-row side curtain airbag may deploy improperly. The dealer installs a protective film over the rear window free of charge. A quick one-time fix — check with your dealer by VIN and mark it done.',
+   shop:'free at dealer', self:'—', diy:'pro'}
+];
+
+/* A sensible default for any car without a tailored schedule. Adjust intervals per vehicle. */
+const GENERIC=[
+  {id:'oil',n:'Engine oil & filter',mi:7500,sev:5000,mo:12,r:'critical',s:'Use the grade in your owner\'s manual',
+   d:'The most important service. Follow the severe interval for short trips, heat, or towing.',shop:'$60–100',self:'~$40 parts',diy:'maybe'},
+  {id:'rotate',n:'Tire rotation',mi:7500,r:'high',d:'Front-to-rear keeps wear even and extends tire life.',shop:'$25–50',self:'free with tools',diy:'maybe'},
+  {id:'brakeinsp',n:'Brake inspection',mi:10000,r:'critical',d:'Check pads, rotors and lines at every rotation.',shop:'often free',self:'free',diy:'diy'},
+  {id:'tires',n:'Tire pressure & tread depth',mi:5000,mo:1,r:'medium',d:'Check with a gauge, not the dashboard light.',shop:'free',self:'free',diy:'diy'},
+  {id:'cabin',n:'Cabin air filter',mi:20000,mo:12,r:'medium',d:'Usually behind the glovebox; cheap and easy.',shop:'$40–65',self:'~$20 parts',diy:'diy'},
+  {id:'engair',n:'Engine air filter',mi:30000,sev:20000,r:'medium',d:'Dust and gravel cut this in half.',shop:'$45–75',self:'~$25 parts',diy:'diy'},
+  {id:'brakefluid',n:'Brake fluid flush',mo:36,r:'high',d:'Time-based. Fluid absorbs moisture and fades under hard braking.',shop:'$110–150',self:'~$18 parts',diy:'pro'},
+  {id:'coolant',n:'Engine coolant',mi:100000,mo:60,r:'high',s:'Use the coolant type your manual specifies',d:'Check the level regularly; the full change is far out on most cars.',shop:'$120–200',self:'~$40 parts',diy:'pro'},
+  {id:'trans',n:'Transmission fluid',mi:100000,sev:60000,r:'high',d:'Even "lifetime" fluid benefits from a change under 60k if you tow or sit in traffic.',shop:'$200–450',self:'varies',diy:'pro'},
+  {id:'plugs',n:'Spark plugs',mi:100000,r:'high',d:'Most modern engines use long-life iridium plugs.',shop:'$200–450',self:'~$80 parts',diy:'maybe'},
+  {id:'batteryrep',n:'12V battery — replace',mo:54,r:'high',wear:true,d:'Four to five years typical, less in heat.',shop:'$180–300',self:'~$170 parts',diy:'maybe'},
+  {id:'brakesfront',n:'Front brake pads & rotors — replace',mi:40000,sev:30000,r:'critical',wear:true,d:'Wear item — depends on driving. The inspection tells you the real number.',shop:'$300–500',self:'~$160 parts',diy:'maybe'},
+  {id:'tiresrep',n:'Tires — replace',mi:45000,r:'critical',wear:true,d:'Judge by tread depth. Rotating on schedule reaches the high end.',shop:'varies by size',self:'—',diy:'pro'},
+  {id:'align',n:'Alignment check',mi:20000,mo:24,r:'low',d:'After a pothole or if the wheel sits off-center.',shop:'$100–180',self:'—',diy:'pro'},
+  {id:'wipers',n:'Wiper blades',mo:12,r:'low',d:'Replace before you need them.',shop:'$25–50',self:'~$30 parts',diy:'diy'}
+];
+
+/* registry: each vehicle stores a scheduleKey, so records stay small and schedules live in code */
+const SCHEDULES={
+  'jeep-wl-36': SCHEDULE,
+  'palisade-lx2-38': PALISADE,
+  'generic': GENERIC
+};
+const SCHEDULE_CHOICES=[
+  {key:'jeep-wl-36', label:'Jeep Grand Cherokee — 3.6L V6', sub:'3.6L Pentastar V6'},
+  {key:'palisade-lx2-38', label:'Hyundai Palisade — 3.8L V6 AWD', sub:'3.8L Lambda II V6 AWD'},
+  {key:'generic', label:'Generic (any vehicle)', sub:'Adjustable schedule'}
+];
+
+function blankVehicle(id,name,sub,scheduleKey,odo,inservice){
+  return {id,name,sub,scheduleKey,duty:'severe',odo:odo||0,inservice:inservice||today(),
+    log:{},repairs:[],odoHistory:[],hideBanner:false,nextSticker:null,seeded:false};
+}
+let state={activeId:null, vehicles:[]};
+let V=null;                              // the active vehicle
+function refreshV(){ V=state.vehicles.find(v=>v.id===state.activeId)||state.vehicles[0]; if(V) state.activeId=V.id; return V; }
+function SCHED(){ return (V&&SCHEDULES[V.scheduleKey])||SCHEDULES.generic; }
+function normalizeVehicle(v){
+  v.repairs=v.repairs||[]; v.odoHistory=v.odoHistory||[]; v.log=v.log||{};
+  if(v.nextSticker===undefined) v.nextSticker=null;
+  if(v.duty===undefined) v.duty='severe';
+  Object.keys(v.log).forEach(id=>(v.log[id]||[]).forEach(e=>{ if(!e.uid) e.uid=newUid(); }));
+  v.repairs.forEach(r=>{ if(!r.uid) r.uid=newUid(); });
+  if(v.scheduleKey==='jeep-wl-36' && !v.seeded && !Object.keys(v.log).length){
+    v.log.oil=[{uid:newUid(),miles:18000,date:'2026-01-02',cost:null,shop:'',notes:'Starting record'}];
+    v.seeded=true;
+  }
+}
 let filter=null, open={}, formOpen={}, repairForm=false;
+let editUid=null, stickerForm=false;
 
 const MS_DAY=86400000, MS_MONTH=MS_DAY*30.44;
 const fmt=n=>Math.round(n).toLocaleString('en-US');
+const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const newUid=()=>String(Date.now())+'-'+Math.random().toString(36).slice(2,6);
 const today=()=>new Date().toISOString().slice(0,10);
 const money=n=>'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 
@@ -430,14 +625,24 @@ async function load(){
   }else{
     setSaveStatus('nostore');
   }
-  if(stored) state=Object.assign(state,stored);
-  state.repairs=state.repairs||[]; state.odoHistory=state.odoHistory||[];
-  if(!state.seeded && !Object.keys(state.log).length){
-    state.log.oil=[{miles:18000,date:'2026-01-02',cost:null,shop:'',notes:'Starting record'}];
-    state.seeded=true;
-    save();
+  if(stored && stored.vehicles){
+    state=stored;                                   // already multi-vehicle
+  }else if(stored){
+    // migrate the old single-car format into vehicle #1 (the Jeep)
+    const v=blankVehicle('veh1','2024 Grand Cherokee Summit','3.6L Pentastar V6','jeep-wl-36',28000,'2024-01-15');
+    ['duty','odo','inservice','log','repairs','odoHistory','hideBanner','nextSticker','seeded']
+      .forEach(k=>{ if(stored[k]!==undefined) v[k]=stored[k]; });
+    state={activeId:'veh1', vehicles:[v]};
   }
-  odo.value=odo2.value=state.odo; duty.value=state.duty; inservice.value=state.inservice;
+  if(!state.vehicles || !state.vehicles.length){
+    state={activeId:'veh1', vehicles:[
+      blankVehicle('veh1','2024 Grand Cherokee Summit','3.6L Pentastar V6','jeep-wl-36',28000,'2024-01-15')
+    ]};
+  }
+  refreshV();
+  state.vehicles.forEach(normalizeVehicle);
+  save();
+  syncInputs();
   render();
   if(saveState==='idle') setSaveStatus('saved');
 }
@@ -478,21 +683,21 @@ window.addEventListener('beforeunload',()=>{ if(savePending) flush(); });
 
 /* ---------- mileage rate ---------- */
 function noteOdo(){
-  const h=state.odoHistory, t=today();
-  if(h.length && h[h.length-1].date===t){ h[h.length-1].miles=state.odo; }
-  else h.push({miles:state.odo,date:t});
+  const h=V.odoHistory, t=today();
+  if(h.length && h[h.length-1].date===t){ h[h.length-1].miles=V.odo; }
+  else h.push({miles:V.odo,date:t});
   if(h.length>60) h.splice(0,h.length-60);
 }
 function milesPerDay(){
-  const h=state.odoHistory;
+  const h=V.odoHistory;
   if(h.length>=2){
     const a=h[0], b=h[h.length-1];
     const days=(new Date(b.date)-new Date(a.date))/MS_DAY;
     const miles=b.miles-a.miles;
     if(days>=30 && miles>0) return miles/days;
   }
-  const days=(new Date()-new Date(state.inservice))/MS_DAY;
-  if(days>60 && state.odo>0) return state.odo/days;
+  const days=(new Date()-new Date(V.inservice))/MS_DAY;
+  if(days>60 && V.odo>0) return V.odo/days;
   return 12000/365.25;
 }
 function whenText(milesLeft){
@@ -505,14 +710,19 @@ function whenText(milesLeft){
 }
 
 /* ---------- status ---------- */
-function ivMiles(it){return it.mi? (state.duty==='severe'&&it.sev? it.sev: it.mi) : null;}
-function lastEntry(it){const l=state.log[it.id]; return l&&l.length? l[l.length-1]:null;}
+function ivMiles(it){return it.mi? (V.duty==='severe'&&it.sev? it.sev: it.mi) : null;}
+function lastEntry(it){const l=V.log[it.id]; return l&&l.length? l[l.length-1]:null;}
 function status(it){
   const iv=ivMiles(it), last=lastEntry(it);
+  if(it.once){
+    const done=!!last;
+    return {level:done?'ok':'soon', milesLeft:null, dueAt:null, monthsLeft:null, dueDate:null,
+      iv:null, last, byTime:false, sortMiles: done? 9e8 : V.odo-1, estimated:false, once:true, done};
+  }
   const baseMiles=last? last.miles:0;
-  const baseDate=last? new Date(last.date): new Date(state.inservice);
+  const baseDate=last? new Date(last.date): new Date(V.inservice);
   let milesLeft=null,dueAt=null;
-  if(iv){dueAt=baseMiles+iv; milesLeft=dueAt-state.odo;}
+  if(iv){dueAt=baseMiles+iv; milesLeft=dueAt-V.odo;}
   let monthsLeft=null,dueDate=null;
   if(it.mo){dueDate=new Date(baseDate.getTime()+it.mo*MS_MONTH); monthsLeft=(dueDate-new Date())/MS_MONTH;}
   const milePct=iv? milesLeft/iv:Infinity, timePct=it.mo? monthsLeft/it.mo:Infinity;
@@ -521,7 +731,7 @@ function status(it){
   const byTime=timePct<milePct;
   let sortMiles=dueAt;
   if(byTime||!iv){
-    const est=state.odo+(monthsLeft*30.44)*milesPerDay();
+    const est=V.odo+(monthsLeft*30.44)*milesPerDay();
     sortMiles=(iv==null)?est:Math.min(dueAt,est);
   }
   return {level,milesLeft,dueAt,monthsLeft,dueDate,iv,last,byTime,sortMiles,estimated:(iv==null||byTime)};
@@ -539,7 +749,7 @@ function flash(msg){
 /* ---------- render ---------- */
 function computeAll(){
   const counts={over:0,soon:0,ok:0};
-  const all=SCHEDULE.map(it=>{const st=status(it); counts[st.level]++; return {it,st};});
+  const all=SCHED().map(it=>{const st=status(it); counts[st.level]++; return {it,st};});
   all.sort((a,b)=>a.st.sortMiles-b.st.sortMiles);
   return {all,counts};
 }
@@ -556,13 +766,25 @@ function buildList(container, items){
   items.forEach(({it,st})=>container.appendChild(row(it,st)));
 }
 
+function syncInputs(){
+  const o=document.getElementById('odo'), o2=document.getElementById('odo2');
+  if(o) o.value=V.odo; if(o2) o2.value=V.odo;
+  const d=document.getElementById('duty'), i=document.getElementById('inservice');
+  if(d) d.value=V.duty; if(i) i.value=V.inservice;
+}
+function renderHeader(){
+  const n=document.getElementById('vehName'), sub=document.getElementById('vehSub');
+  if(n) n.textContent=V.name; if(sub) sub.textContent=(V.sub||'')+' · Service log';
+}
 function render(){
+  refreshV();
+  renderHeader();
   const {all,counts}=computeAll();
 
   // rate note (Due tab)
   const mpd=milesPerDay();
   rate.innerHTML=`Averaging <b>${fmt(mpd*30.44)}</b> mi/mo`+
-    (state.odoHistory.length>=2?`` :` — estimated`);
+    (V.odoHistory.length>=2?`` :` — estimated`);
 
   // next-up headline
   const over=all.filter(x=>x.st.level==='over');
@@ -585,12 +807,12 @@ function render(){
 
   // banner
   banner.innerHTML='';
-  const logged=Object.keys(state.log).length;
-  if(!logged && !state.hideBanner){
+  const logged=Object.keys(V.log).length;
+  if(!logged && !V.hideBanner){
     banner.innerHTML=`<div class="banner"><button class="link q x" id="hideb">Dismiss</button>
       <b>Start with what's already been done.</b> Every interval is counting from zero miles, so the dates
       are theoretical. Check off your last oil change and rotation and the list becomes real.</div>`;
-    document.getElementById('hideb').onclick=()=>{state.hideBanner=true; save(); render();};
+    document.getElementById('hideb').onclick=()=>{V.hideBanner=true; save(); render();};
   }
 
   // chips
@@ -613,13 +835,90 @@ function render(){
   // Schedule list: everything
   buildList(document.getElementById('schedList'), all);
 
+  renderSticker();
   renderHistory();
   renderRepairs();
   renderSpend();
 }
 
+function renderSticker(){
+  const box=document.getElementById('sticker');
+  const s=V.nextSticker;
+
+  if(stickerForm){
+    box.innerHTML=`<div class="stick edit">
+      <div class="stick-h">Next service reminder</div>
+      <div class="form">
+        <div class="f wide"><label>Service (optional)</label>
+          <input type="text" id="sk-label" value="${esc(s?s.label:'')}" placeholder="Oil & filter"></div>
+        <div class="f"><label>Due at odometer</label>
+          <input type="number" id="sk-miles" value="${s&&s.miles!=null?s.miles:V.odo+5000}"></div>
+        <div class="f"><label>Due by date</label>
+          <input type="date" id="sk-date" value="${s&&s.date?s.date:''}"></div>
+        <div class="form-actions">
+          <button class="btn" id="sk-save">Save</button>
+          <button class="btn ghost" id="sk-cancel">Cancel</button>
+        </div>
+      </div></div>`;
+    document.getElementById('sk-save').onclick=()=>{
+      const miles=parseInt(document.getElementById('sk-miles').value,10);
+      const date=document.getElementById('sk-date').value;
+      if(isNaN(miles)&&!date){ alert('Enter a mileage, a date, or both.'); return; }
+      V.nextSticker={label:document.getElementById('sk-label').value.trim(),
+        miles:isNaN(miles)?null:miles, date:date||null};
+      stickerForm=false; save(); render();
+    };
+    document.getElementById('sk-cancel').onclick=()=>{ stickerForm=false; render(); };
+    return;
+  }
+
+  if(!s){
+    box.innerHTML=`<button class="stick add" id="sk-add">+ Set next service reminder</button>`;
+    document.getElementById('sk-add').onclick=()=>{ stickerForm=true; render(); };
+    return;
+  }
+
+  // countdown
+  const milesLeft = s.miles!=null ? s.miles-V.odo : null;
+  let daysLeft=null;
+  if(s.date){
+    const d=new Date(s.date+'T00:00:00'); const now=new Date(); now.setHours(0,0,0,0);
+    daysLeft=Math.round((d-now)/MS_DAY);
+  }
+  const overMiles = milesLeft!=null && milesLeft<=0;
+  const overDays  = daysLeft!=null && daysLeft<=0;
+  const due = overMiles || overDays;
+
+  const parts=[];
+  if(milesLeft!=null) parts.push(overMiles? `${fmt(-milesLeft)} mi past` : `${fmt(milesLeft)} mi`);
+  if(daysLeft!=null)  parts.push(overDays? `${Math.abs(daysLeft)} days past` : `${daysLeft} days`);
+  const cd = due ? 'Due now' : parts.join(' · ') + ' left';
+
+  const target=[];
+  if(s.miles!=null) target.push(`${fmt(s.miles)} mi`);
+  if(s.date) target.push(new Date(s.date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}));
+
+  box.innerHTML=`<div class="stick ${due?'due':'ok'}">
+    <div class="stick-top">
+      <span class="stick-h">Next service</span>
+      <span class="stick-acts">
+        <button class="link" id="sk-edit">Edit</button>
+        <button class="link d" id="sk-clear">Clear</button>
+      </span>
+    </div>
+    ${s.label?`<div class="stick-label">${esc(s.label)}</div>`:''}
+    <div class="stick-target">${target.join(' &nbsp;·&nbsp; ')}</div>
+    <div class="stick-cd">${cd}</div>
+  </div>`;
+  document.getElementById('sk-edit').onclick=()=>{ stickerForm=true; render(); };
+  document.getElementById('sk-clear').onclick=()=>{
+    if(!confirm('Clear the next-service reminder?')) return;
+    V.nextSticker=null; save(); render();
+  };
+}
+
 function renderSpend(){
-  const spent=[...state.repairs,...Object.values(state.log).flat()]
+  const spent=[...V.repairs,...Object.values(V.log).flat()]
     .reduce((s,e)=>s+(Number(e.cost)||0),0);
   const el=document.getElementById('spend');
   el.innerHTML = spent>0 ? `Total recorded spend <b>${money(spent)}</b>` : '';
@@ -639,6 +938,43 @@ function row(it,st){
   const el=document.createElement('div'); el.className='item';
   const rate_=RATING[it.r], col=LEVEL[st.level].c;
 
+  if(st.once){
+    const done=st.done;
+    const entries=V.log[it.id]||[];
+    const entriesHtml = entries.length
+      ? entries.map((e,i)=>`<div class="entry"><span class="m">${new Date(e.date).toLocaleDateString('en-US')}</span>
+          <span>${entryLine(e)||'checked'}</span></div>`).join('')
+      : '<div class="entry" style="color:var(--faint)">Not addressed yet.</div>';
+    el.innerHTML=`
+     <div class="mile" style="color:${col}">—<small style="color:var(--faint)">One-time</small></div>
+     <div>
+      <div class="line1">
+        <span class="dot" style="background:${col}"></span>
+        <span class="name">${it.n}</span>
+        <span class="due" style="color:${col}">${done?'Done':'Check with dealer'}</span>
+      </div>
+      <div class="line2">
+        <span class="rating" style="color:${rate_.color}">${RATING[it.r].label}</span>
+        <span class="sep">·</span><span>One-time recall / campaign</span>
+      </div>
+      <div class="line2 costs">${it.shop?`<span class="pill cost">${it.shop}</span>`:''}</div>
+      <div class="actions">
+        <button class="link strong" data-quick>${done?'Logged':'Mark handled'}</button>
+        <button class="link q" data-more>${open[it.id]?'Hide details':'Details'}</button>
+      </div>
+      ${open[it.id]?`<div class="panel"><div class="detail">${it.d}
+        ${it.s?`<div class="spec">${it.s}</div>`:''}</div>
+        <div class="entries">${entriesHtml}</div></div>`:''}
+     </div>`;
+    el.querySelector('[data-quick]').onclick=()=>{
+      if(done){ flash('Already logged.'); return; }
+      (V.log[it.id]=V.log[it.id]||[]).push({uid:newUid(),miles:V.odo,date:today(),cost:null,shop:'',notes:'Handled',quick:true});
+      save(); render(); flash(`${it.n} marked handled.`);
+    };
+    el.querySelector('[data-more]').onclick=()=>{open[it.id]=!open[it.id]; render();};
+    return el;
+  }
+
   let due = st.iv
     ? (st.milesLeft<=0 ? (it.wear?`${fmt(-st.milesLeft)} mi past window`:`${fmt(-st.milesLeft)} mi past due`) : `${fmt(st.milesLeft)} mi left`)
     : (st.monthsLeft<=0 ? 'Past due' : `${Math.round(st.monthsLeft)} mo left`);
@@ -650,14 +986,14 @@ function row(it,st){
   const iv = it.wear
     ? `Typically around ${fmt(st.iv||0)} mi — wear item, inspect to confirm`
     : st.iv
-      ? `Every ${fmt(st.iv)} mi${it.mo?` or ${it.mo} mo`:''}${state.duty==='severe'&&it.sev?', severe duty':''}`
+      ? `Every ${fmt(st.iv)} mi${it.mo?` or ${it.mo} mo`:''}${V.duty==='severe'&&it.sev?', severe duty':''}`
       : `Every ${it.mo} months`;
 
   const mileNum = st.estimated ? `~${fmt(st.sortMiles)}` : fmt(st.dueAt);
   const mileNote = it.wear ? (st.level==='over'?'Expect now':'Expect near')
     : st.level==='over' ? 'Overdue' : st.estimated ? 'Estimated' : 'Miles';
 
-  const entries=state.log[it.id]||[];
+  const entries=V.log[it.id]||[];
   const entriesHtml = entries.length
     ? entries.map((e,i)=>`<div class="entry"><span class="m">${entryMiles(e)}</span>
         <span>${new Date(e.date).toLocaleDateString('en-US')}${entryLine(e)?' — '+entryLine(e):''}</span>
@@ -695,23 +1031,23 @@ function row(it,st){
    </div>`;
 
   el.querySelector('[data-quick]').onclick=()=>{
-    (state.log[it.id]=state.log[it.id]||[]).push({miles:state.odo,date:today(),cost:null,shop:'',notes:'',quick:true});
-    state.log[it.id].sort((a,b)=>a.miles-b.miles);
+    (V.log[it.id]=V.log[it.id]||[]).push({miles:V.odo,date:today(),cost:null,shop:'',notes:'',quick:true});
+    V.log[it.id].sort((a,b)=>a.miles-b.miles);
     formOpen[it.id]=false; save(); render();
-    flash(`${it.n} checked off at ${fmt(state.odo)} miles.`);
+    flash(`${it.n} checked off at ${fmt(V.odo)} miles.`);
   };
   const ub=el.querySelector('[data-undo]');
   if(ub) ub.onclick=()=>{
-    const l=state.log[it.id]; if(!l||!l.length) return;
-    const e=l.pop(); if(!l.length) delete state.log[it.id];
+    const l=V.log[it.id]; if(!l||!l.length) return;
+    const e=l.pop(); if(!l.length) delete V.log[it.id];
     save(); render(); flash(`Removed the ${fmt(e.miles)} mile entry for ${it.n}.`);
   };
   el.querySelector('[data-do]').onclick=()=>{formOpen[it.id]=!formOpen[it.id]; render();};
   el.querySelector('[data-more]').onclick=()=>{open[it.id]=!open[it.id]; render();};
   el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
     if(!confirm('Remove this entry?')) return;
-    state.log[it.id].splice(+b.dataset.del,1);
-    if(!state.log[it.id].length) delete state.log[it.id];
+    V.log[it.id].splice(+b.dataset.del,1);
+    if(!V.log[it.id].length) delete V.log[it.id];
     save(); render();
   });
   if(formOpen[it.id]) wireForm(el,it.id);
@@ -720,7 +1056,7 @@ function row(it,st){
 
 function formHtml(id){
   return `<div class="panel"><div class="form">
-    <div class="f"><label for="m-${id}">Odometer</label><input type="number" id="m-${id}" value="${state.odo}"></div>
+    <div class="f"><label for="m-${id}">Odometer</label><input type="number" id="m-${id}" value="${V.odo}"></div>
     <div class="f"><label for="d-${id}">Date</label><input type="date" id="d-${id}" value="${today()}"></div>
     <div class="f"><label for="c-${id}">Cost</label><input type="number" step="0.01" id="c-${id}" placeholder="0.00"></div>
     <div class="f"><label for="s-${id}">Shop or "did it myself"</label><input type="text" id="s-${id}" placeholder="Optional"></div>
@@ -739,26 +1075,60 @@ function wireForm(el,id){
     const date=el.querySelector('#d-'+id).value;
     if(isNaN(miles)||!date){alert('Enter an odometer reading and a date.');return;}
     const cost=el.querySelector('#c-'+id).value;
-    (state.log[id]=state.log[id]||[]).push({
+    (V.log[id]=V.log[id]||[]).push({
       miles,date,cost:cost===''?null:parseFloat(cost),
       est:el.querySelector('#e-'+id).checked,
       shop:el.querySelector('#s-'+id).value.trim(),
       notes:el.querySelector('#n-'+id).value.trim()
     });
-    state.log[id].sort((a,b)=>a.miles-b.miles);
+    V.log[id].sort((a,b)=>a.miles-b.miles);
     formOpen[id]=false; save(); render();
   };
   el.querySelector('#cancel-'+id).onclick=()=>{formOpen[id]=false; render();};
 }
 
 /* ---------- repairs ---------- */
-const NAME=Object.fromEntries(SCHEDULE.map(it=>[it.id,it.n]));
+function nameMap(){return Object.fromEntries(SCHED().map(it=>[it.id,it.n]));}
+
+/* shared inline edit form for a completed-maintenance entry or a repair */
+function editFormHtml(kind,o){
+  return `<div class="panel editpanel"><div class="form">
+    ${kind==='repair'?`<div class="f wide"><label>What was done</label><input type="text" id="ed-title" value="${esc(o.title)}"></div>`:''}
+    <div class="f"><label>Odometer</label><input type="number" id="ed-miles" value="${o.miles}"></div>
+    <div class="f"><label>Date</label><input type="date" id="ed-date" value="${o.date}"></div>
+    <div class="f"><label>Cost</label><input type="number" step="0.01" id="ed-cost" value="${o.cost==null?'':o.cost}"></div>
+    <div class="f"><label>Shop</label><input type="text" id="ed-shop" value="${esc(o.shop||'')}"></div>
+    <div class="f wide check"><label class="cb"><input type="checkbox" id="ed-est" ${o.est?'checked':''}> Mileage is an estimate</label></div>
+    <div class="f wide"><label>Notes</label><textarea id="ed-notes">${esc(o.notes||'')}</textarea></div>
+    <div class="form-actions"><button class="btn" id="ed-save">Save changes</button>
+      <button class="btn ghost" id="ed-cancel">Cancel</button></div>
+  </div></div>`;
+}
+function applyEdit(o,kind){
+  const g=id=>document.getElementById(id);
+  const miles=parseInt(g('ed-miles').value,10);
+  const date=g('ed-date').value;
+  if(isNaN(miles)||!date){ alert('Enter an odometer reading and a date.'); return false; }
+  if(kind==='repair'){
+    const t=g('ed-title').value.trim();
+    if(!t){ alert('Enter what was done.'); return false; }
+    o.title=t;
+  }
+  o.miles=miles; o.date=date;
+  const c=g('ed-cost').value; o.cost = c===''? null : parseFloat(c);
+  o.shop=g('ed-shop').value.trim();
+  o.notes=g('ed-notes').value.trim();
+  o.est=g('ed-est').checked;
+  return true;
+}
+
 function renderHistory(){
+  const NAME=nameMap();
   const rows=[];
-  Object.keys(state.log).forEach(id=>{
-    (state.log[id]||[]).forEach(e=>rows.push({id, ...e}));
+  Object.keys(V.log).forEach(id=>{
+    (V.log[id]||[]).forEach(e=>rows.push({id, e}));
   });
-  rows.sort((a,b)=> (b.date>a.date?1:b.date<a.date?-1:0) || b.miles-a.miles);
+  rows.sort((a,b)=> (b.e.date>a.e.date?1:b.e.date<a.e.date?-1:0) || b.e.miles-a.e.miles);
 
   const box=document.getElementById('history');
   const segBtn=document.querySelector('#histSeg [data-seg="done"]');
@@ -769,33 +1139,50 @@ function renderHistory(){
       <div>Nothing checked off yet. As you complete services they'll gather here, newest first.</div><div></div></div>`;
     return;
   }
-  box.innerHTML = rows.map(e=>{
+  box.innerHTML = rows.map(({id,e})=>{
     const extra=entryLine(e);
+    const editing = editUid===e.uid;
     return `<div class="repair">
       <div class="m">${e.est?'~':''}${fmt(e.miles)}<small>${new Date(e.date).toLocaleDateString('en-US')}</small></div>
-      <div><div class="t">${NAME[e.id]||e.id}</div>${extra?`<div class="n">${extra}</div>`:''}</div>
-      <button class="link d" data-hdel="${e.id}|${e.miles}|${e.date}">Remove</button></div>`;
+      <div><div class="t">${NAME[id]||id}</div>${extra?`<div class="n">${extra}</div>`:''}</div>
+      <div class="rowacts">
+        <button class="link" data-hedit="${e.uid}">${editing?'Close':'Edit'}</button>
+        <button class="link d" data-hdel="${e.uid}">Remove</button>
+      </div>
+      ${editing?editFormHtml('log',e):''}</div>`;
   }).join('');
 
+  box.querySelectorAll('[data-hedit]').forEach(b=>b.onclick=()=>{
+    editUid = editUid===b.dataset.hedit? null : b.dataset.hedit; render();
+  });
   box.querySelectorAll('[data-hdel]').forEach(b=>b.onclick=()=>{
     if(!confirm('Remove this completed entry?')) return;
-    const [id,miles,date]=b.dataset.hdel.split('|');
-    const arr=state.log[id]||[];
-    const i=arr.findIndex(e=>String(e.miles)===miles && e.date===date);
-    if(i>-1) arr.splice(i,1);
-    if(!arr.length) delete state.log[id];
+    const u=b.dataset.hdel;
+    Object.keys(V.log).forEach(id=>{
+      V.log[id]=(V.log[id]||[]).filter(e=>e.uid!==u);
+      if(!V.log[id].length) delete V.log[id];
+    });
+    if(editUid===u) editUid=null;
     save(); render();
   });
+  if(editUid){
+    const ref = rows.map(r=>r.e).find(e=>e.uid===editUid);
+    if(ref){
+      const sv=document.getElementById('ed-save'), cn=document.getElementById('ed-cancel');
+      if(sv) sv.onclick=()=>{ if(applyEdit(ref,'log')){ editUid=null; save(); render(); } };
+      if(cn) cn.onclick=()=>{ editUid=null; render(); };
+    }
+  }
 }
 
 function renderRepairs(){
   const box=document.getElementById('repairs');
-  const list_=[...state.repairs].sort((a,b)=>b.miles-a.miles);
+  const list_=[...V.repairs].sort((a,b)=>b.miles-a.miles);
   let html=`<div class="actions" style="margin:12px 0 0">
       <button class="link" id="addRepair">${repairForm?'Cancel':'Add a repair'}</button></div>`;
   if(repairForm) html+=`<div class="panel" style="margin-left:0"><div class="form">
     <div class="f wide"><label for="rt">What was done</label><input type="text" id="rt" placeholder="Front brake pads and rotors"></div>
-    <div class="f"><label for="rm">Odometer</label><input type="number" id="rm" value="${state.odo}"></div>
+    <div class="f"><label for="rm">Odometer</label><input type="number" id="rm" value="${V.odo}"></div>
     <div class="f"><label for="rd">Date</label><input type="date" id="rd" value="${today()}"></div>
     <div class="f"><label for="rc">Cost</label><input type="number" step="0.01" id="rc" placeholder="0.00"></div>
     <div class="f"><label for="rs">Shop</label><input type="text" id="rs" placeholder="Optional"></div>
@@ -805,15 +1192,22 @@ function renderRepairs(){
       <button class="btn ghost" id="rcancel">Cancel</button></div></div></div>`;
 
   html += list_.length
-    ? list_.map(r=>`<div class="repair">
+    ? list_.map(r=>{
+        const editing = editUid===r.uid;
+        return `<div class="repair">
         <div class="m">${r.est?"~":""}${fmt(r.miles)}<small>${new Date(r.date).toLocaleDateString('en-US')}</small></div>
-        <div><div class="t">${r.title}</div>
+        <div><div class="t">${esc(r.title)}</div>
           ${entryLine(r)?`<div class="n">${entryLine(r)}</div>`:''}</div>
-        <button class="link d" data-rdel="${r.uid}">Remove</button></div>`).join('')
+        <div class="rowacts">
+          <button class="link" data-redit="${r.uid}">${editing?'Close':'Edit'}</button>
+          <button class="link d" data-rdel="${r.uid}">Remove</button>
+        </div>
+        ${editing?editFormHtml('repair',r):''}</div>`;
+      }).join('')
     : `<div class="repair" style="color:var(--faint)"><div class="m">—</div><div>No repairs recorded. Anything outside the maintenance schedule goes here — a patched tire, a battery, a recall.</div><div></div></div>`;
 
   box.innerHTML=html;
-  document.getElementById('addRepair').onclick=()=>{repairForm=!repairForm; render();};
+  document.getElementById('addRepair').onclick=()=>{repairForm=!repairForm; editUid=null; render();};
   if(repairForm){
     document.getElementById('rsave').onclick=()=>{
       const title=document.getElementById('rt').value.trim();
@@ -821,7 +1215,7 @@ function renderRepairs(){
       const date=document.getElementById('rd').value;
       if(!title||isNaN(miles)||!date){alert('Enter what was done, the odometer reading, and a date.');return;}
       const cost=document.getElementById('rc').value;
-      state.repairs.push({uid:String(Date.now()),title,miles,date,
+      V.repairs.push({uid:newUid(),title,miles,date,
         est:document.getElementById('re').checked,
         cost:cost===''?null:parseFloat(cost),
         shop:document.getElementById('rs').value.trim(),
@@ -830,17 +1224,29 @@ function renderRepairs(){
     };
     document.getElementById('rcancel').onclick=()=>{repairForm=false; render();};
   }
+  box.querySelectorAll('[data-redit]').forEach(b=>b.onclick=()=>{
+    editUid = editUid===b.dataset.redit? null : b.dataset.redit; render();
+  });
   box.querySelectorAll('[data-rdel]').forEach(b=>b.onclick=()=>{
     if(!confirm('Remove this repair?')) return;
-    state.repairs=state.repairs.filter(r=>r.uid!==b.dataset.rdel);
+    V.repairs=V.repairs.filter(r=>r.uid!==b.dataset.rdel);
+    if(editUid===b.dataset.rdel) editUid=null;
     save(); render();
   });
+  if(editUid){
+    const ref=V.repairs.find(r=>r.uid===editUid);
+    if(ref){
+      const sv=document.getElementById('ed-save'), cn=document.getElementById('ed-cancel');
+      if(sv) sv.onclick=()=>{ if(applyEdit(ref,'repair')){ editUid=null; save(); render(); } };
+      if(cn) cn.onclick=()=>{ editUid=null; render(); };
+    }
+  }
 }
 
 /* ---------- inputs ---------- */
 let odoTimer;
 function onOdoInput(src){
-  const v=parseInt(src.value,10); state.odo=isNaN(v)?0:v;
+  const v=parseInt(src.value,10); V.odo=isNaN(v)?0:v;
   const other = src.id==='odo'? odo2 : odo;
   if(other && document.activeElement!==other) other.value=src.value;
   render();
@@ -849,8 +1255,8 @@ function onOdoInput(src){
 }
 odo.addEventListener('input',()=>onOdoInput(odo));
 odo2.addEventListener('input',()=>onOdoInput(odo2));
-duty.addEventListener('change',e=>{state.duty=e.target.value; save(); render();});
-inservice.addEventListener('change',e=>{state.inservice=e.target.value; save(); render();});
+duty.addEventListener('change',e=>{V.duty=e.target.value; save(); render();});
+inservice.addEventListener('change',e=>{V.inservice=e.target.value; save(); render();});
 
 /* ---------- tabs ---------- */
 function showTab(name){
@@ -860,6 +1266,109 @@ function showTab(name){
 }
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 document.getElementById('toSchedule').onclick=()=>showTab('schedule');
+
+/* ---------- vehicle switcher ---------- */
+function closeVehMenu(){ document.getElementById('vehMenu').hidden=true; }
+function openVehMenu(){
+  const m=document.getElementById('vehMenu');
+  let html='';
+  state.vehicles.forEach(v=>{
+    const on=v.id===state.activeId;
+    html+=`<button data-vsel="${v.id}" class="${on?'on':''}">
+      <span>${esc(v.name)}<span class="vm-sub">${esc(v.sub||'')}</span></span>
+      ${on?'<span class="vm-check">&#10003;</span>':''}</button>`;
+  });
+  html+=`<button data-vadd class="vm-act">+ Add a vehicle</button>`;
+  html+=`<button data-vmanage class="vm-act">Manage vehicles</button>`;
+  m.innerHTML=html; m.hidden=false;
+  m.querySelectorAll('[data-vsel]').forEach(b=>b.onclick=()=>{ switchVehicle(b.dataset.vsel); closeVehMenu(); });
+  m.querySelector('[data-vadd]').onclick=()=>{ closeVehMenu(); addVehicleModal(); };
+  m.querySelector('[data-vmanage]').onclick=()=>{ closeVehMenu(); manageModal(); };
+}
+document.getElementById('vehSwitch').onclick=(e)=>{
+  e.stopPropagation();
+  const m=document.getElementById('vehMenu');
+  m.hidden ? openVehMenu() : closeVehMenu();
+};
+document.addEventListener('click',e=>{
+  const m=document.getElementById('vehMenu');
+  if(!m.hidden && !m.contains(e.target) && e.target.id!=='vehSwitch') closeVehMenu();
+});
+function switchVehicle(id){
+  if(!state.vehicles.some(v=>v.id===id)) return;
+  state.activeId=id; refreshV();
+  filter=null; open={}; formOpen={}; repairForm=false; editUid=null; stickerForm=false;
+  save(); syncInputs(); render(); showTab('due');
+}
+
+/* ---------- modal helpers ---------- */
+function openModal(html){
+  document.getElementById('modal').innerHTML=html;
+  document.getElementById('overlay').hidden=false;
+}
+function closeModal(){ document.getElementById('overlay').hidden=true; }
+document.getElementById('overlay').onclick=e=>{ if(e.target.id==='overlay') closeModal(); };
+
+function scheduleOptions(sel){
+  return SCHEDULE_CHOICES.map(c=>`<option value="${c.key}" ${c.key===sel?'selected':''}>${c.label}</option>`).join('');
+}
+function addVehicleModal(){
+  openModal(`<h3>Add a vehicle</h3><div class="form">
+    <div class="f wide"><label>Name (year, make, model)</label>
+      <input type="text" id="nv-name" placeholder="2022 Palisade Calligraphy"></div>
+    <div class="f wide"><label>Maintenance schedule</label>
+      <select id="nv-key">${scheduleOptions('generic')}</select></div>
+    <div class="f"><label>Current odometer</label><input type="number" id="nv-odo" value="0"></div>
+    <div class="f"><label>In service since</label><input type="date" id="nv-date" value="${today()}"></div>
+    <div class="form-actions">
+      <button class="btn" id="nv-save">Add vehicle</button>
+      <button class="btn ghost" id="nv-cancel">Cancel</button>
+    </div>
+    <p class="intro fine" style="margin-top:14px">Pick the closest built-in schedule. Want a tailored one for a
+      specific car? Ask and it can be added like the Jeep and Palisade.</p></div>`);
+  document.getElementById('nv-cancel').onclick=closeModal;
+  document.getElementById('nv-save').onclick=()=>{
+    const name=document.getElementById('nv-name').value.trim();
+    if(!name){ alert('Give the vehicle a name.'); return; }
+    const key=document.getElementById('nv-key').value;
+    const odo=parseInt(document.getElementById('nv-odo').value,10)||0;
+    const date=document.getElementById('nv-date').value||today();
+    const sub=(SCHEDULE_CHOICES.find(c=>c.key===key)||{}).sub||'';
+    const v=blankVehicle('veh'+Date.now(), name, sub, key, odo, date);
+    normalizeVehicle(v);
+    state.vehicles.push(v);
+    closeModal(); switchVehicle(v.id);
+  };
+}
+function manageModal(){
+  let rows=state.vehicles.map(v=>`<div class="vrow">
+    <div class="nm"><b>${esc(v.name)}</b><span>${esc(v.sub||'')}</span></div>
+    <button class="link" data-vren="${v.id}">Rename</button>
+    <button class="link d" data-vdel="${v.id}" ${state.vehicles.length<2?'style="display:none"':''}>Delete</button>
+  </div>`).join('');
+  openModal(`<h3>Manage vehicles</h3>${rows}
+    <div class="form-actions" style="margin-top:16px">
+      <button class="btn" id="mg-add">+ Add a vehicle</button>
+      <button class="btn ghost" id="mg-close">Done</button></div>`);
+  document.getElementById('mg-close').onclick=closeModal;
+  document.getElementById('mg-add').onclick=()=>{ closeModal(); addVehicleModal(); };
+  document.querySelectorAll('[data-vren]').forEach(b=>b.onclick=()=>{
+    const v=state.vehicles.find(x=>x.id===b.dataset.vren);
+    const nn=prompt('Vehicle name:', v.name);
+    if(nn && nn.trim()){ v.name=nn.trim(); save(); renderHeader(); manageModal(); }
+  });
+  document.querySelectorAll('[data-vdel]').forEach(b=>b.onclick=()=>{
+    if(state.vehicles.length<2) return;
+    const v=state.vehicles.find(x=>x.id===b.dataset.vdel);
+    if(!confirm(`Delete ${v.name} and all its records? This cannot be undone.`)) return;
+    state.vehicles=state.vehicles.filter(x=>x.id!==b.dataset.vdel);
+    if(state.activeId===b.dataset.vdel) state.activeId=state.vehicles[0].id;
+    refreshV(); save(); syncInputs();
+    if(state.vehicles.length) manageModal(); else closeModal();
+    render();
+  });
+}
+
 
 /* ---------- history segmented toggle ---------- */
 document.querySelectorAll('#histSeg button').forEach(b=>b.onclick=()=>{
@@ -872,17 +1381,17 @@ document.querySelectorAll('#histSeg button').forEach(b=>b.onclick=()=>{
 /* ---------- footer actions ---------- */
 document.getElementById('reset').onclick=()=>{
   if(!confirm('Erase all logged services, repairs, and odometer history? This cannot be undone.')) return;
-  state.log={}; state.repairs=[]; state.odoHistory=[]; save(); render();
+  V.log={}; V.repairs=[]; V.odoHistory=[]; save(); render();
 };
 document.getElementById('export').onclick=()=>{
-  let out=`2024 Jeep Grand Cherokee Summit — service record\nOdometer: ${fmt(state.odo)} mi · ${new Date().toLocaleDateString('en-US')}\n\nSCHEDULED MAINTENANCE\n`;
-  SCHEDULE.forEach(it=>{
-    const l=state.log[it.id]; if(!l) return;
+  let out=`2024 Jeep Grand Cherokee Summit — service record\nOdometer: ${fmt(V.odo)} mi · ${new Date().toLocaleDateString('en-US')}\n\nSCHEDULED MAINTENANCE\n`;
+  SCHED().forEach(it=>{
+    const l=V.log[it.id]; if(!l) return;
     out+=`\n${it.n}\n`+l.map(e=>`   ${entryMiles(e)} · ${e.date}${entryLine(e)?' · '+entryLine(e):''}`).join('\n')+'\n';
   });
-  if(state.repairs.length){
+  if(V.repairs.length){
     out+=`\nREPAIRS & OTHER WORK\n`;
-    [...state.repairs].sort((a,b)=>a.miles-b.miles).forEach(r=>{
+    [...V.repairs].sort((a,b)=>a.miles-b.miles).forEach(r=>{
       out+=`   ${r.est?"~":""}${fmt(r.miles)} mi · ${r.date} · ${r.title}${entryLine(r)?' · '+entryLine(r):''}\n`;});
   }
   navigator.clipboard.writeText(out).then(()=>{
@@ -908,8 +1417,8 @@ document.getElementById('restoreFile').addEventListener('change',ev=>{
       if(!data.log) throw new Error('bad file');
       if(!confirm('Replace your current records with this backup?')) return;
       state=Object.assign(state,data);
-      odo.value=odo2.value=state.odo; duty.value=state.duty; inservice.value=state.inservice;
-      save(); render();
+      if(!state.vehicles){ /* migrate restored old format */ location.reload(); return; }
+      refreshV(); state.vehicles.forEach(normalizeVehicle); save(); syncInputs(); render();
     }catch(e){ alert('That file could not be read as a service backup.'); }
   };
   r.readAsText(f); ev.target.value='';
@@ -919,7 +1428,7 @@ document.getElementById('ics').onclick=()=>{
   const stamp=d=>`${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}`;
   let ics='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Grand Cherokee Service Log//EN\r\nCALSCALE:GREGORIAN\r\n';
   let n=0;
-  SCHEDULE.forEach(it=>{
+  SCHED().forEach(it=>{
     const st=status(it);
     let when;
     if(st.level==='over') when=new Date(Date.now()+3*MS_DAY);
