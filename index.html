@@ -74,6 +74,10 @@
   .line2{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline;margin:5px 0 0 15px;color:var(--mid);font-size:13px}
   .rating{font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:600}
   .sep{color:var(--rule)}
+  .costs{margin-top:6px}
+  .pill{display:inline-block;font-size:11.5px;color:var(--mid);border:1px solid var(--rule);
+    border-radius:999px;padding:1px 9px;line-height:1.5}
+  .pill.diy{font-family:var(--display);text-transform:uppercase;letter-spacing:.1em;font-size:10px;font-weight:600}
   .actions{margin:9px 0 0 15px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
   button.link{background:none;border:0;padding:0;cursor:pointer;font-family:var(--body);
     font-size:12.5px;color:var(--slate);font-weight:500}
@@ -166,6 +170,9 @@
   <div id="banner"></div>
   <div class="tally" id="tally"></div>
   <div id="list"></div>
+
+  <h2 class="sec">Completed maintenance <span id="histcount"></span></h2>
+  <div id="history"></div>
 
   <h2 class="sec">Repairs &amp; other work</h2>
   <div id="repairs"></div>
@@ -280,6 +287,47 @@ const SCHEDULE=[
   {id:'wipers',n:'Wiper blades',mo:12,r:'low',d:'Replace in the fall, before you need them.'},
   {id:'ac',n:'A/C performance check',mo:24,r:'low',d:'A vent-temp check catches a slow refrigerant leak before the compressor runs dry.'}
 ];
+
+/* Ballpark 2026 US costs for a 2024 GC Summit 3.6L. "shop" = independent shop; a dealer
+   runs higher. DIY figure is parts only. diy: 'diy' anyone with basic tools, 'maybe' if
+   you're handy, 'pro' leave it to a shop (special tools or real risk if done wrong). */
+const EXTRA={
+  oil:{shop:'$75–110', self:'~$45 parts', diy:'maybe'},
+  rotate:{shop:'$25–50', self:'free if you have a jack & torque wrench', diy:'maybe'},
+  brakeinsp:{shop:'often free', self:'free', diy:'diy'},
+  tires:{shop:'free', self:'free', diy:'diy'},
+  cabin:{shop:'$40–65', self:'~$18 parts', diy:'diy'},
+  engair:{shop:'$45–75', self:'~$25 parts', diy:'diy'},
+  brakefluid:{shop:'$110–150', self:'~$20 parts', diy:'pro'},
+  coolant:{shop:'$140–210', self:'~$45 parts', diy:'pro'},
+  trans:{shop:'$450–700', self:'~$250 parts', diy:'pro'},
+  tcase:{shop:'$120–180', self:'~$30 parts', diy:'maybe'},
+  axles:{shop:'$160–320 both', self:'~$70 parts', diy:'maybe'},
+  plugs:{shop:'$260–450', self:'~$90 parts', diy:'pro'},
+  belt:{shop:'$120–200', self:'~$60 parts', diy:'maybe'},
+  pcv:{shop:'$70–130', self:'~$25 parts', diy:'maybe'},
+  brakesfront:{shop:'$350–550', self:'~$180 parts', diy:'maybe'},
+  brakesrear:{shop:'$380–600', self:'~$190 parts', diy:'pro'},
+  tiresrep:{shop:'$1,200–1,600 installed', self:'—', diy:'pro'},
+  batteryrep:{shop:'$350–600 both', self:'~$300 parts', diy:'maybe'},
+  shocks:{shop:'inspection often free', self:'free to inspect', diy:'diy'},
+  oilhousing:{shop:'free to inspect', self:'free', diy:'diy'},
+  hoses:{shop:'free to inspect', self:'free', diy:'diy'},
+  throttle:{shop:'$90–150', self:'~$12 cleaner', diy:'diy'},
+  bearings:{shop:'often free', self:'free', diy:'diy'},
+  susp:{shop:'$0–120', self:'free to inspect', diy:'diy'},
+  align:{shop:'$100–180', self:'—', diy:'pro'},
+  battery:{shop:'often free', self:'~$25 tester', diy:'maybe'},
+  wipers:{shop:'$25–50', self:'~$30 parts', diy:'diy'},
+  ac:{shop:'$0–120', self:'—', diy:'maybe'}
+};
+SCHEDULE.forEach(it=>Object.assign(it, EXTRA[it.id]||{}));
+
+const DIY={
+  diy:{label:'DIY-friendly', color:'#4E6B3D'},
+  maybe:{label:'DIY if handy', color:'#4F6E82'},
+  pro:{label:'Best at a shop', color:'#AF7A1E'}
+};
 
 let state={duty:'severe',odo:28000,inservice:'2024-01-15',log:{},repairs:[],odoHistory:[],hideBanner:false};
 let filter=null, open={}, formOpen={}, repairForm=false;
@@ -438,6 +486,7 @@ function render(){
     tally.appendChild(b);
   });
 
+  renderHistory();
   renderRepairs();
 }
 
@@ -493,6 +542,11 @@ function row(it,st){
       <span class="sep">·</span><span>${iv}</span>
       ${when?`<span class="sep">·</span><span>${when}</span>`:''}
     </div>
+    <div class="line2 costs">
+      ${it.shop?`<span class="pill cost">${it.shop} at a shop</span>`:''}
+      ${it.diy?`<span class="pill diy" style="color:${DIY[it.diy].color};border-color:${DIY[it.diy].color}">${DIY[it.diy].label}</span>`:''}
+      ${it.self&&it.self!=='—'&&it.diy!=='pro'?`<span class="pill">Yourself: ${it.self}</span>`:''}
+    </div>
     <div class="actions">
       <button class="link strong" data-quick>Done &mdash; check it off</button>
       <button class="link" data-do>${formOpen[it.id]?'Cancel':'Log with details'}</button>
@@ -509,7 +563,7 @@ function row(it,st){
     (state.log[it.id]=state.log[it.id]||[]).push({miles:state.odo,date:today(),cost:null,shop:'',notes:'',quick:true});
     state.log[it.id].sort((a,b)=>a.miles-b.miles);
     formOpen[it.id]=false; save(); render();
-    flash(`${it.n} logged at ${fmt(state.odo)} miles.`);
+    flash(`${it.n} checked off at ${fmt(state.odo)} miles.`);
   };
   const ub=el.querySelector('[data-undo]');
   if(ub) ub.onclick=()=>{
@@ -563,6 +617,42 @@ function wireForm(el,id){
 }
 
 /* ---------- repairs ---------- */
+const NAME=Object.fromEntries(SCHEDULE.map(it=>[it.id,it.n]));
+function renderHistory(){
+  const rows=[];
+  Object.keys(state.log).forEach(id=>{
+    (state.log[id]||[]).forEach(e=>rows.push({id, ...e}));
+  });
+  rows.sort((a,b)=> (b.date>a.date?1:b.date<a.date?-1:0) || b.miles-a.miles);
+
+  const box=document.getElementById('history');
+  const hc=document.getElementById('histcount');
+  hc.textContent = rows.length? `· ${rows.length}` : '';
+
+  if(!rows.length){
+    box.innerHTML=`<div class="repair" style="color:var(--faint)"><div class="m">—</div>
+      <div>Nothing checked off yet. As you complete services they'll gather here, newest first.</div><div></div></div>`;
+    return;
+  }
+  box.innerHTML = rows.map(e=>{
+    const extra=entryLine(e);
+    return `<div class="repair">
+      <div class="m">${e.est?'~':''}${fmt(e.miles)}<small>${new Date(e.date).toLocaleDateString('en-US')}</small></div>
+      <div><div class="t">${NAME[e.id]||e.id}</div>${extra?`<div class="n">${extra}</div>`:''}</div>
+      <button class="link d" data-hdel="${e.id}|${e.miles}|${e.date}">Remove</button></div>`;
+  }).join('');
+
+  box.querySelectorAll('[data-hdel]').forEach(b=>b.onclick=()=>{
+    if(!confirm('Remove this completed entry?')) return;
+    const [id,miles,date]=b.dataset.hdel.split('|');
+    const arr=state.log[id]||[];
+    const i=arr.findIndex(e=>String(e.miles)===miles && e.date===date);
+    if(i>-1) arr.splice(i,1);
+    if(!arr.length) delete state.log[id];
+    save(); render();
+  });
+}
+
 function renderRepairs(){
   const box=document.getElementById('repairs');
   const list_=[...state.repairs].sort((a,b)=>b.miles-a.miles);

@@ -11,7 +11,11 @@ Everything runs in the browser. No accounts, no server, no data leaves the phone
 - Every scheduled service ordered by the odometer reading it comes due at
 - Importance rating on each item — Critical, High, Medium, Low
 - Normal vs. severe duty intervals (severe is Jeep's Schedule B: short trips, heat, towing, dust)
-- One-tap check-off, or a full entry with cost, shop, parts, and invoice number
+- One-tap check-off — clears a service even if you haven't reached its due mileage
+- Or a full entry with cost, shop, parts, and invoice number
+- Estimated shop cost on every service, plus a DIY-yourself parts figure
+- A DIY rating on each item — do it yourself, do it if you're handy, or leave it to a shop
+- Completed maintenance history, newest first
 - Wear items — brakes, tires, battery — shown as expected windows rather than hard intervals
 - Learns your actual monthly mileage from odometer entries and projects dates from it
 - Separate log for repairs and unscheduled work, with a running spend total
