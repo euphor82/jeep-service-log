@@ -8,6 +8,16 @@ Everything runs in the browser. No accounts, no server, no data leaves the phone
 
 ## What it does
 
+Four tabs along the bottom:
+
+- **Due** — odometer entry, a plain-language "what needs attention" headline, and the list of
+  anything overdue or coming up. Tap the status counts to filter.
+- **Schedule** — every service ordered by mileage, with cost estimates, DIY ratings, and details.
+- **History** — toggle between completed maintenance and repairs, with a running spend total.
+- **Settings** — driving conditions, in-service date, backup/restore, calendar export, and reset.
+
+Other features:
+
 - Every scheduled service ordered by the odometer reading it comes due at
 - Importance rating on each item — Critical, High, Medium, Low
 - Normal vs. severe duty intervals (severe is Jeep's Schedule B: short trips, heat, towing, dust)

@@ -1,5 +1,5 @@
 /* Bump CACHE whenever you change index.html, or phones will keep serving the old copy. */
-const CACHE = 'gc-service-log-v2';
+const CACHE = 'gc-service-log-v3';
 const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

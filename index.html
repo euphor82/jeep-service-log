@@ -33,7 +33,7 @@
   header{padding:30px 0 0}
   .title{font-family:var(--display);font-size:26px;font-weight:600;line-height:1.1}
   .sub{color:var(--mid);font-size:13.5px;margin-top:4px}
-  .odo-block{margin:22px 0 0;display:flex;align-items:flex-end;gap:22px;flex-wrap:wrap}
+  .odo-block{margin:14px 0 6px;display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
   .odo-field{display:flex;flex-direction:column;gap:6px;min-width:0}
   .odo{font-family:var(--mono);font-weight:600;font-size:clamp(30px,7.5vw,44px);line-height:1.05;
     letter-spacing:-.02em;color:var(--ink);background:transparent;border:0;border-bottom:1.5px solid var(--rule);
@@ -45,7 +45,7 @@
     background:#fff;color:var(--ink);border:1px solid var(--rule);border-radius:6px;
     padding:8px 10px;font-family:var(--body);font-size:14px;max-width:100%}
   select:focus,input:focus,textarea:focus{outline:2px solid var(--slate);outline-offset:1px}
-  .rate{margin-top:10px;color:var(--mid);font-size:12.5px}
+  .rate{color:var(--mid);font-size:12.5px;padding-bottom:8px}
   .rate b{font-family:var(--mono);color:var(--ink);font-weight:600}
 
   .banner{margin:22px 0 0;padding:14px 16px;background:#fff;border:1px solid var(--rule);
@@ -137,20 +137,108 @@
     .line1{flex-wrap:wrap}
     .due{width:100%;margin-left:15px}
   }
+
+  /* ---- tabs & bottom nav ---- */
+  .wrap{padding-bottom:92px}
+  header{padding:26px 0 4px}
+  .tab{animation:fade .18s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  #nav{position:fixed;left:0;right:0;bottom:0;z-index:40;
+    display:grid;grid-template-columns:repeat(4,1fr);
+    background:rgba(251,251,249,.92);backdrop-filter:blur(8px);
+    border-top:1px solid var(--rule)}
+  #nav button{background:none;border:0;cursor:pointer;padding:9px 4px calc(9px + env(safe-area-inset-bottom));
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    font-family:var(--display);text-transform:uppercase;letter-spacing:.1em;font-size:11px;
+    color:var(--faint)}
+  #nav button .ic{font-size:19px;line-height:1}
+  #nav button.on{color:var(--ink)}
+  #nav button.on .ic{color:var(--slate)}
+
+  /* ---- next-up headline ---- */
+  .nextup{padding:14px 16px;border-radius:8px;font-size:14px;margin:4px 0 4px;
+    border:1px solid var(--rule);background:#fff;line-height:1.45}
+  .nextup .tag{display:inline-block;font-family:var(--display);text-transform:uppercase;
+    letter-spacing:.12em;font-size:10px;font-weight:600;margin-right:8px;padding:1px 8px;border-radius:3px;color:#fff}
+  .nextup.over{border-left:3px solid var(--red)} .nextup.over .tag{background:var(--red)}
+  .nextup.soon{border-left:3px solid var(--amber)} .nextup.soon .tag{background:var(--amber)}
+  .nextup.ok{border-left:3px solid var(--green)} .nextup.ok .tag{background:var(--green)}
+
+  .seeall{display:inline-block;margin:18px 0 0}
+  .intro{color:var(--mid);font-size:13.5px;line-height:1.6;margin:4px 0 8px}
+  .intro.fine{font-size:12.5px;margin-top:22px;border-top:1px solid var(--rule);padding-top:14px}
+
+  /* ---- history segmented control ---- */
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--rule-2);
+    border-radius:8px;padding:4px;margin:6px 0 18px}
+  .seg button{background:none;border:0;cursor:pointer;padding:9px 8px;border-radius:6px;
+    font-family:var(--body);font-size:13px;font-weight:500;color:var(--mid)}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+  .spendrow{margin:18px 0 0;padding-top:14px;border-top:1px solid var(--rule);
+    font-family:var(--mono);font-size:12.5px;color:var(--mid)}
+  .spendrow b{color:var(--ink)}
+
+  /* ---- settings ---- */
+  .set-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin:8px 0 4px}
+  #tab-settings .foot-actions{margin-top:8px}
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <header>
-    <div class="lab">Service log</div>
-    <h1 class="title">2024 Jeep Grand Cherokee Summit</h1>
-    <div class="sub">3.6L Pentastar V6 · ZF 8HP75 · Quadra-Trac</div>
+    <h1 class="title">2024 Grand Cherokee Summit</h1>
+    <div class="sub">3.6L Pentastar V6 · Service log</div>
+  </header>
 
+  <!-- ============ DUE ============ -->
+  <section id="tab-due" class="tab">
     <div class="odo-block">
       <div class="odo-field">
         <span class="lab">Odometer</span>
         <input class="odo" id="odo" type="number" inputmode="numeric" min="0" max="999999" value="28000">
+      </div>
+      <div class="rate" id="rate"></div>
+    </div>
+    <div id="nextup"></div>
+    <div id="banner"></div>
+    <div class="tally" id="tally"></div>
+    <div id="list"></div>
+    <button class="link q seeall" id="toSchedule">View the full schedule &rarr;</button>
+  </section>
+
+  <!-- ============ SCHEDULE ============ -->
+  <section id="tab-schedule" class="tab" hidden>
+    <p class="intro">Every service, ordered by the odometer reading it comes due at. Tap
+      <b>Details &amp; history</b> on any item for specs, cost, and what's been logged.</p>
+    <div id="schedList"></div>
+    <p class="intro fine">Intervals follow the Jeep schedule for the 2024 WL with the 3.6L Pentastar V6,
+      with conservative adjustments where real-world wear runs ahead of the book. <b>Severe duty</b> is
+      Jeep's Schedule B — short trips, stop-and-go, towing, dust, heavy idling; most owners qualify.
+      Wear-item windows are typical ranges, not promises. Check your owner's manual for your exact build.</p>
+  </section>
+
+  <!-- ============ HISTORY ============ -->
+  <section id="tab-history" class="tab" hidden>
+    <div class="seg" id="histSeg">
+      <button data-seg="done" class="on">Completed maintenance</button>
+      <button data-seg="repairs">Repairs &amp; other work</button>
+    </div>
+    <div id="histPane">
+      <div id="history"></div>
+    </div>
+    <div id="repairsPane" hidden>
+      <div id="repairs"></div>
+    </div>
+    <div class="spendrow" id="spend"></div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section id="tab-settings" class="tab" hidden>
+    <div class="set-grid">
+      <div class="setting">
+        <span class="lab">Odometer</span>
+        <input id="odo2" type="number" inputmode="numeric" min="0" max="999999" value="28000">
       </div>
       <div class="setting">
         <span class="lab">Driving conditions</span>
@@ -164,20 +252,8 @@
         <input type="date" id="inservice" value="2024-01-15">
       </div>
     </div>
-    <div class="rate" id="rate"></div>
-  </header>
 
-  <div id="banner"></div>
-  <div class="tally" id="tally"></div>
-  <div id="list"></div>
-
-  <h2 class="sec">Completed maintenance <span id="histcount"></span></h2>
-  <div id="history"></div>
-
-  <h2 class="sec">Repairs &amp; other work</h2>
-  <div id="repairs"></div>
-
-  <footer>
+    <h2 class="sec">Your records</h2>
     <div class="foot-actions">
       <button class="link" id="ics">Add reminders to calendar</button>
       <button class="link" id="backup">Download backup</button>
@@ -186,13 +262,21 @@
       <button class="link d" id="reset">Clear everything</button>
       <input type="file" id="restoreFile" accept=".json" hidden>
     </div>
-    <div id="savestate" style="font-size:12px;margin:-8px 0 16px;color:var(--faint)">All changes saved</div>
-    Intervals follow the Jeep schedule for the 2024 WL with the 3.6L Pentastar V6, with conservative
-    adjustments where real-world wear runs ahead of the book. <b>Severe duty</b> is Jeep's Schedule B —
-    short trips, stop-and-go, towing, dust, or heavy idling; most owners qualify. Items marked
-    <b>Critical</b> risk engine, brake, or safety damage if skipped. Your records live in this browser,
-    so download a backup now and then.
-  </footer>
+    <div id="savestate" style="font-size:12px;margin:6px 0 0;color:var(--faint)">All changes saved</div>
+
+    <p class="intro fine" style="margin-top:22px">Records live in this browser on this device — they don't
+      sync between your phone and computer. Use <b>Download backup</b> now and then; <b>Restore</b> reads it
+      back, including onto another device. <b>Severe duty</b> halves several intervals and is the right
+      setting for most owners.</p>
+  </section>
+
+  <!-- ============ BOTTOM NAV ============ -->
+  <nav id="nav">
+    <button data-tab="due" class="on"><span class="ic">&#9678;</span>Due</button>
+    <button data-tab="schedule"><span class="ic">&#9776;</span>Schedule</button>
+    <button data-tab="history"><span class="ic">&#10003;</span>History</button>
+    <button data-tab="settings"><span class="ic">&#9881;</span>Settings</button>
+  </nav>
 </div>
 
 <script>
@@ -353,7 +437,7 @@ async function load(){
     state.seeded=true;
     save();
   }
-  odo.value=state.odo; duty.value=state.duty; inservice.value=state.inservice;
+  odo.value=odo2.value=state.odo; duty.value=state.duty; inservice.value=state.inservice;
   render();
   if(saveState==='idle') setSaveStatus('saved');
 }
@@ -453,30 +537,63 @@ function flash(msg){
 }
 
 /* ---------- render ---------- */
-function render(){
+function computeAll(){
   const counts={over:0,soon:0,ok:0};
   const all=SCHEDULE.map(it=>{const st=status(it); counts[st.level]++; return {it,st};});
   all.sort((a,b)=>a.st.sortMiles-b.st.sortMiles);
+  return {all,counts};
+}
+function buildList(container, items){
+  container.innerHTML='';
+  const head=document.createElement('div'); head.className='colhead';
+  head.innerHTML='<span class="lab">Due at odometer</span><span class="lab">Service</span>';
+  container.appendChild(head);
+  if(!items.length){
+    const e=document.createElement('div'); e.className='item';
+    e.innerHTML='<div></div><div style="color:var(--faint)">Nothing here right now.</div>';
+    container.appendChild(e); return;
+  }
+  items.forEach(({it,st})=>container.appendChild(row(it,st)));
+}
 
+function render(){
+  const {all,counts}=computeAll();
+
+  // rate note (Due tab)
   const mpd=milesPerDay();
-  rate.innerHTML=`You're averaging <b>${fmt(mpd*30.44)}</b> miles a month`+
-    (state.odoHistory.length>=2?` based on your odometer entries.`:` — estimated from the in-service date. Update the odometer now and then and this gets sharper.`);
+  rate.innerHTML=`Averaging <b>${fmt(mpd*30.44)}</b> mi/mo`+
+    (state.odoHistory.length>=2?`` :` — estimated`);
 
+  // next-up headline
+  const over=all.filter(x=>x.st.level==='over');
+  const soon=all.filter(x=>x.st.level==='soon');
+  const nu=document.getElementById('nextup');
+  if(over.length){
+    const x=over[0];
+    const by = x.st.iv? `${fmt(-x.st.milesLeft)} mi overdue` : 'overdue';
+    nu.innerHTML=`<div class="nextup over"><span class="tag">Needs attention</span>
+      <b>${x.it.n}</b> — ${by}${over.length>1?` · +${over.length-1} more overdue`:''}</div>`;
+  }else if(soon.length){
+    const x=soon[0];
+    const by = x.st.iv? `${fmt(x.st.milesLeft)} mi left` : `${Math.round(x.st.monthsLeft)} mo left`;
+    nu.innerHTML=`<div class="nextup soon"><span class="tag">Coming up</span>
+      <b>${x.it.n}</b> — ${by}</div>`;
+  }else{
+    nu.innerHTML=`<div class="nextup ok"><span class="tag">All caught up</span>
+      Nothing due. Next: <b>${all[0].it.n}</b> at ${fmt(all[0].st.dueAt||all[0].st.sortMiles)} mi</div>`;
+  }
+
+  // banner
   banner.innerHTML='';
   const logged=Object.keys(state.log).length;
   if(!logged && !state.hideBanner){
     banner.innerHTML=`<div class="banner"><button class="link q x" id="hideb">Dismiss</button>
-      <b>Start with what's already been done.</b> Every interval below is currently counting from zero miles,
-      so the dates are theoretical. Log your last oil change and tire rotation and the whole list becomes real.</div>`;
+      <b>Start with what's already been done.</b> Every interval is counting from zero miles, so the dates
+      are theoretical. Check off your last oil change and rotation and the list becomes real.</div>`;
     document.getElementById('hideb').onclick=()=>{state.hideBanner=true; save(); render();};
   }
 
-  list.innerHTML='';
-  const head=document.createElement('div'); head.className='colhead';
-  head.innerHTML='<span class="lab">Due at odometer</span><span class="lab">Service</span>';
-  list.appendChild(head);
-  all.forEach(({it,st})=>{ if(filter&&st.level!==filter) return; list.appendChild(row(it,st)); });
-
+  // chips
   tally.innerHTML='';
   [['over','Overdue'],['soon','Due soon'],['ok','Up to date']].forEach(([k,label])=>{
     const b=document.createElement('button'); b.className='chip';
@@ -486,8 +603,26 @@ function render(){
     tally.appendChild(b);
   });
 
+  // Due list: filtered level, or attention (over+soon) by default
+  const dueItems = filter ? all.filter(x=>x.st.level===filter) : all.filter(x=>x.st.level!=='ok');
+  buildList(document.getElementById('list'), dueItems);
+  const seeAll=document.getElementById('toSchedule');
+  if(!filter && !dueItems.length){ seeAll.textContent='Everything is up to date — view the full schedule →'; }
+  else seeAll.innerHTML='View the full schedule &rarr;';
+
+  // Schedule list: everything
+  buildList(document.getElementById('schedList'), all);
+
   renderHistory();
   renderRepairs();
+  renderSpend();
+}
+
+function renderSpend(){
+  const spent=[...state.repairs,...Object.values(state.log).flat()]
+    .reduce((s,e)=>s+(Number(e.cost)||0),0);
+  const el=document.getElementById('spend');
+  el.innerHTML = spent>0 ? `Total recorded spend <b>${money(spent)}</b>` : '';
 }
 
 function entryLine(e){
@@ -626,8 +761,8 @@ function renderHistory(){
   rows.sort((a,b)=> (b.date>a.date?1:b.date<a.date?-1:0) || b.miles-a.miles);
 
   const box=document.getElementById('history');
-  const hc=document.getElementById('histcount');
-  hc.textContent = rows.length? `· ${rows.length}` : '';
+  const segBtn=document.querySelector('#histSeg [data-seg="done"]');
+  if(segBtn) segBtn.dataset.count = rows.length||'';
 
   if(!rows.length){
     box.innerHTML=`<div class="repair" style="color:var(--faint)"><div class="m">—</div>
@@ -677,10 +812,6 @@ function renderRepairs(){
         <button class="link d" data-rdel="${r.uid}">Remove</button></div>`).join('')
     : `<div class="repair" style="color:var(--faint)"><div class="m">—</div><div>No repairs recorded. Anything outside the maintenance schedule goes here — a patched tire, a battery, a recall.</div><div></div></div>`;
 
-  const spent=[...state.repairs,...Object.values(state.log).flat()]
-    .reduce((s,e)=>s+(Number(e.cost)||0),0);
-  if(spent>0) html+=`<div class="totals">Total recorded spend: ${money(spent)}</div>`;
-
   box.innerHTML=html;
   document.getElementById('addRepair').onclick=()=>{repairForm=!repairForm; render();};
   if(repairForm){
@@ -708,14 +839,35 @@ function renderRepairs(){
 
 /* ---------- inputs ---------- */
 let odoTimer;
-odo.addEventListener('input',e=>{
-  const v=parseInt(e.target.value,10); state.odo=isNaN(v)?0:v;
+function onOdoInput(src){
+  const v=parseInt(src.value,10); state.odo=isNaN(v)?0:v;
+  const other = src.id==='odo'? odo2 : odo;
+  if(other && document.activeElement!==other) other.value=src.value;
   render();
   clearTimeout(odoTimer);
   odoTimer=setTimeout(()=>{ noteOdo(); save(); },900);
-});
+}
+odo.addEventListener('input',()=>onOdoInput(odo));
+odo2.addEventListener('input',()=>onOdoInput(odo2));
 duty.addEventListener('change',e=>{state.duty=e.target.value; save(); render();});
 inservice.addEventListener('change',e=>{state.inservice=e.target.value; save(); render();});
+
+/* ---------- tabs ---------- */
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.hidden = (t.id!=='tab-'+name));
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.tab===name));
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+document.getElementById('toSchedule').onclick=()=>showTab('schedule');
+
+/* ---------- history segmented toggle ---------- */
+document.querySelectorAll('#histSeg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#histSeg button').forEach(x=>x.classList.toggle('on',x===b));
+  const done = b.dataset.seg==='done';
+  document.getElementById('histPane').hidden=!done;
+  document.getElementById('repairsPane').hidden=done;
+});
 
 /* ---------- footer actions ---------- */
 document.getElementById('reset').onclick=()=>{
@@ -756,7 +908,7 @@ document.getElementById('restoreFile').addEventListener('change',ev=>{
       if(!data.log) throw new Error('bad file');
       if(!confirm('Replace your current records with this backup?')) return;
       state=Object.assign(state,data);
-      odo.value=state.odo; duty.value=state.duty; inservice.value=state.inservice;
+      odo.value=odo2.value=state.odo; duty.value=state.duty; inservice.value=state.inservice;
       save(); render();
     }catch(e){ alert('That file could not be read as a service backup.'); }
   };
